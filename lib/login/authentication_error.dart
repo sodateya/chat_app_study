@@ -7,6 +7,8 @@ class Authentication_error {
   login_error_msg(String errorCode) {
     String errorMsg;
 
+
+
     if (errorCode == 'invalid-email') {
       errorMsg = '有効なメールアドレスを入力してください。';
     } else if (errorCode == 'user-not-found') {
