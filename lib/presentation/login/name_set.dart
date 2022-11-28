@@ -1,6 +1,5 @@
-import 'package:chat_app_study/home/home.dart';
-import 'package:chat_app_study/login/login_model.dart';
 import 'package:chat_app_study/main.dart';
+import 'package:chat_app_study/presentation/login/login_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

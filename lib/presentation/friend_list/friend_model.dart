@@ -2,7 +2,7 @@
 
 import 'dart:math';
 
-import 'package:chat_app_study/friend/friend.dart';
+import 'package:chat_app_study/domain/friend.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +20,20 @@ class FriendModel extends ChangeNotifier {
         .get();
     final userLists = doc.docs.map((doc) => Friend(doc)).toList();
     userList = userLists;
-    print(userList.first.name);
     notifyListeners();
+  }
+
+  Future fetchUserList(String uid) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(uid)
+        .collection('friendList')
+        .snapshots();
+    doc.listen((snapshots) async {
+      final userLists = snapshots.docs.map((doc) => Friend(doc)).toList();
+      userList = userLists;
+      notifyListeners();
+    });
   }
 
   Future addUserList() async {

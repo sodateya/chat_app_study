@@ -1,4 +1,4 @@
-import 'package:chat_app_study/home/home_model.dart';
+import 'package:chat_app_study/presentation/home/home_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,8 +22,7 @@ class Home extends StatelessWidget {
                     icon: Icon(Icons.chat_bubble), label: 'トーク'),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.settings), label: '設定'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person_add_alt_1), label: '追加'),
+                BottomNavigationBarItem(icon: Icon(Icons.check), label: '友達申請'),
               ],
               type: BottomNavigationBarType.fixed,
             ));

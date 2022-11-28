@@ -1,11 +1,11 @@
-import 'package:chat_app_study/home/home_model.dart';
-import 'package:chat_app_study/login/login.dart';
-import 'package:chat_app_study/setting/setting_model.dart';
+import 'package:chat_app_study/presentation/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+
+import 'setting_model.dart';
 
 class SettingPage extends StatelessWidget {
   SettingPage({super.key, required this.auth});

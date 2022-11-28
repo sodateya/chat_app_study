@@ -1,11 +1,14 @@
-import 'package:chat_app_study/my_profile/my_prifile.dart';
+import 'package:chat_app_study/domain/friend.dart';
+import 'package:chat_app_study/presentation/add_friend/add_friend.dart';
+import 'package:chat_app_study/presentation/my_profile/my_prifile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'friend_model.dart';
+
+import 'apply_list_model.dart';
 
 // ignore: must_be_immutable
-class FriendPage extends StatelessWidget {
-  FriendPage({super.key, required this.uid});
+class ApplyListPage extends StatelessWidget {
+  ApplyListPage({super.key, required this.uid});
   String uid;
 
   @override
@@ -17,26 +20,34 @@ class FriendPage extends StatelessWidget {
     }
 
     return ChangeNotifierProvider.value(
-        value: FriendModel()..getUserList(uid),
-        child: Consumer<FriendModel>(builder: (context, model, child) {
+        value: ApplyListModel()..fetchApplyList(uid),
+        child: Consumer<ApplyListModel>(builder: (context, model, child) {
           final friends = model.userList;
           return Scaffold(
             appBar: AppBar(
-              title: const Text('友達リスト'),
+              title: const Text('友達申請'),
+              leading: IconButton(
+                  onPressed: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyProfilePage(uid: uid)));
+                  },
+                  icon: const Icon(Icons.account_circle)),
               actions: [
                 IconButton(
                     onPressed: () async {
                       await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MyProfilePage(uid: uid)));
+                              builder: (context) => AddFriendPage(uid: uid)));
                     },
-                    icon: const Icon(Icons.account_circle))
+                    icon: const Icon(Icons.person_add_alt_1))
               ],
             ),
             body: friends.isEmpty
                 ? const Center(
-                    child: Text('現在友達はいません'),
+                    child: Text('現在申請されているユーザーはいません'),
                   )
                 : SizedBox(
                     width: size.width,
@@ -57,7 +68,7 @@ class FriendPage extends StatelessWidget {
                                 itemCount: friends.length,
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  return UserTile(friends[index].uid);
+                                  return UserTile(friends[index], uid);
                                 },
                               ),
                             ),
@@ -72,13 +83,14 @@ class FriendPage extends StatelessWidget {
 }
 
 class UserTile extends StatelessWidget {
-  UserTile(this.uid, {Key? key}) : super(key: key);
-  String uid;
+  UserTile(this.friends, this.myID, {Key? key}) : super(key: key);
+  Friend friends;
+  String myID;
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-        value: FriendModel()..getUserInfo(uid),
-        child: Consumer<FriendModel>(builder: (context, model, child) {
+        value: ApplyListModel()..getUserInfo(friends.uid),
+        child: Consumer<ApplyListModel>(builder: (context, model, child) {
           return model.userInfo.isEmpty
               ? Container(
                   alignment: Alignment.center,
@@ -106,6 +118,24 @@ class UserTile extends StatelessWidget {
                               image: DecorationImage(
                                   fit: BoxFit.fill,
                                   image: AssetImage('images/user.png')))),
+                  trailing: SizedBox(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          IconButton(
+                              onPressed: () async {
+                                await model.notApprove(friends, myID);
+                              },
+                              icon:
+                                  const Icon(Icons.close, color: Colors.blue)),
+                          IconButton(
+                              onPressed: () async {
+                                await model.approve(friends, myID);
+                              },
+                              icon:
+                                  const Icon(Icons.check, color: Colors.green)),
+                        ],
+                      )),
                 );
         }));
   }

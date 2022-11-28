@@ -1,9 +1,9 @@
-import 'package:chat_app_study/home/home.dart';
+import 'package:chat_app_study/presentation/home/home.dart';
+import 'package:chat_app_study/presentation/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
-import 'login/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

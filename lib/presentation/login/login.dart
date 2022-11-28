@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:chat_app_study/home/home.dart';
-import 'package:chat_app_study/login/registration.dart';
+import 'package:chat_app_study/presentation/home/home.dart';
+import 'package:chat_app_study/presentation/login/registration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';

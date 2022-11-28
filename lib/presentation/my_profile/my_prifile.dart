@@ -1,4 +1,4 @@
-import 'package:chat_app_study/my_profile/my_profile_model.dart';
+import 'package:chat_app_study/presentation/my_profile/my_profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -49,7 +49,17 @@ class MyProfilePage extends StatelessWidget {
                                           fit: BoxFit.fill,
                                           image:
                                               AssetImage('images/user.png')))),
-                          Text(model.userInfo['name']),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(model.userInfo['name']),
+                              IconButton(
+                                  onPressed: () {
+                                    nameChangeDialog(context, model);
+                                  },
+                                  icon: Icon(Icons.edit))
+                            ],
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -82,8 +92,52 @@ class MyProfilePage extends StatelessWidget {
             actions: [
               ElevatedButton(
                   onPressed: () async {
-                    model.uniquID = controller.text;
-                    await model.updataUniquID(uid);
+                    try {
+                      model.uniquID = controller.text;
+                      await model.updataUniquID(uid);
+                      Navigator.of(context).pop();
+                      showDialog(
+                          context: context,
+                          builder: ((context) {
+                            return const AlertDialog(
+                              title: Text('変更しました'),
+                            );
+                          }));
+                    } catch (e) {
+                      showDialog(
+                          context: context,
+                          builder: ((context) {
+                            return AlertDialog(
+                              title: Text(
+                                e.toString(),
+                                style: const TextStyle(color: Colors.redAccent),
+                              ),
+                            );
+                          }));
+                    }
+                  },
+                  child: const Text('確定'))
+            ],
+            actionsAlignment: MainAxisAlignment.center,
+          );
+        }));
+  }
+
+  Future nameChangeDialog(BuildContext context, MyProfileModel model) async {
+    TextEditingController controller = TextEditingController();
+    showDialog(
+        context: context,
+        builder: ((context) {
+          return AlertDialog(
+            title: const Text('新しい名前を入力してください'),
+            content: TextField(
+              controller: controller,
+            ),
+            actions: [
+              ElevatedButton(
+                  onPressed: () async {
+                    model.name = controller.text;
+                    await model.updataName(uid);
                     Navigator.of(context).pop();
                     showDialog(
                         context: context,
