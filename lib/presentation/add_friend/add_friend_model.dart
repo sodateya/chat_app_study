@@ -1,14 +1,8 @@
-// ignore_for_file: await_only_futures
-
-import 'dart:math';
-
-import 'package:chat_app_study/domain/friend.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AddFriendModel extends ChangeNotifier {
-  late String uniquID;
+  String uniquID = '';
   late Map<String, dynamic> firendData;
   late bool isUsed;
   late bool isMyFriend;
@@ -16,17 +10,18 @@ class AddFriendModel extends ChangeNotifier {
   Map<String, dynamic> userInfo = {};
 
   Future getFriendDada(String id, String uid) async {
+    if (id == '') {
+      throw ('IDを入力してください');
+    }
     await chackCanUseId(id);
     if (isUsed == false) {
       throw ('該当するユーザーはいません');
     }
-
     final doc = await FirebaseFirestore.instance
         .collection('user')
         .where('uniquID', isEqualTo: id)
         .get();
     firendData = await doc.docs.first.data();
-
     await chackIsMyFriend(firendData['uid'], uid);
     if (isMyFriend == true) {
       throw ('既に友達のユーザーです');
@@ -42,13 +37,11 @@ class AddFriendModel extends ChangeNotifier {
         .where('uid', isEqualTo: friendUid)
         .get();
     final length = doc.docs.length;
-    print(length);
     if (length == 0) {
       isMyFriend = false;
     } else {
       isMyFriend = true;
     }
-    print(isMyFriend);
     notifyListeners();
   }
 

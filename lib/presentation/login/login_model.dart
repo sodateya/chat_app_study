@@ -46,7 +46,7 @@ class LoginModel extends ChangeNotifier {
     if (name.isEmpty || name == "") {
       throw ('名前を入力してください');
     }
-    final token = FirebaseMessaging.instance.getToken();
+    final token = await FirebaseMessaging.instance.getToken();
     FirebaseFirestore.instance.collection('user').doc(user.uid).set({
       'uid': user.uid,
       'photUrl': user.photoURL,

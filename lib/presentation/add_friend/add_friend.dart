@@ -9,6 +9,7 @@ import 'add_friend_model.dart';
 class AddFriendPage extends StatelessWidget {
   AddFriendPage({super.key, required this.uid});
   String uid;
+  TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,38 +21,26 @@ class AddFriendPage extends StatelessWidget {
           return Scaffold(
               appBar: AppBar(
                 title: const Text('友達検索'),
-                // actions: [
-                //   IconButton(
-                //       onPressed: () async {
-                //         await Navigator.push(
-                //             context,
-                //             MaterialPageRoute(
-                //                 builder: (context) => MyProfilePage(uid: uid)));
-                //       },
-                //       icon: const Icon(Icons.account_circle))
-                // ],
               ),
               body: SizedBox(
                 width: size.width,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
+                    const Padding(
+                      padding: EdgeInsets.all(20.0),
                       child: Text('IDで検索'),
                     ),
-                    Container(
+                    SizedBox(
                       width: size.width * 0.8,
                       child: TextFormField(
+                        controller: controller,
                         decoration: InputDecoration(
                           labelText: "IDを入力",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onChanged: (String value) {
-                          model.uniquID = value;
-                        },
                       ),
                     ),
                     Padding(
@@ -59,8 +48,8 @@ class AddFriendPage extends StatelessWidget {
                       child: ElevatedButton(
                           onPressed: () async {
                             try {
-                              await model.getFriendDada(model.uniquID, uid);
-                              // ignore: use_build_context_synchronously
+                              model.uniquID = controller.text;
+                              await model.getFriendDada(model.uniquID!, uid);
                               await showDialog(
                                   context: context,
                                   builder: ((context) {
