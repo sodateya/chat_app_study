@@ -7,7 +7,7 @@ import '../friend_list/friend_page.dart';
 import '../setting/setting.dart';
 
 class HomeModel extends ChangeNotifier {
-  List screens = [
+  final screens = [
     FriendPage(uid: FirebaseAuth.instance.currentUser!.uid),
     FriendPage(uid: FirebaseAuth.instance.currentUser!.uid),
     SettingPage(auth: FirebaseAuth.instance),
