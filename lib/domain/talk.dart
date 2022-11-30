@@ -16,4 +16,5 @@ class Talk {
   late String comment;
   late String url;
   late String imgURL;
+  late String mm;
 }
