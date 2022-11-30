@@ -28,27 +28,36 @@ class MyProfilePage extends StatelessWidget {
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                          model.userInfo['photUrl'] != null
-                              ? Container(
-                                  alignment: Alignment.center,
-                                  height: 100,
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image: NetworkImage(
-                                              model.userInfo['photUrl']))))
-                              : Container(
-                                  alignment: Alignment.center,
-                                  height: 100,
-                                  width: 100,
-                                  decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image:
-                                              AssetImage('images/user.png')))),
+                          Row(
+                            children: [
+                              model.userInfo['photUrl'] != null
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      height: 100,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              fit: BoxFit.fill,
+                                              image: NetworkImage(
+                                                  model.userInfo['photUrl']))))
+                                  : Container(
+                                      alignment: Alignment.center,
+                                      height: 100,
+                                      width: 100,
+                                      decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              fit: BoxFit.fill,
+                                              image: AssetImage(
+                                                  'images/user.png')))),
+                              IconButton(
+                                  onPressed: () async {
+                                    await model.pickImage();
+                                  },
+                                  icon: const Icon(Icons.picture_as_pdf))
+                            ],
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

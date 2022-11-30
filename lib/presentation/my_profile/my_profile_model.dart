@@ -1,23 +1,27 @@
 // ignore_for_file: await_only_futures
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MyProfileModel extends ChangeNotifier {
   late String uniquID;
   late String name;
   late bool isUsed;
+  late File imageFile;
+  final picker = ImagePicker();
 
   final firebase = FirebaseFirestore.instance;
   Map<String, dynamic> userInfo = {};
 
   Future getMyData(String uid) async {
     final doc = await firebase.collection('user').doc(uid).snapshots();
-    doc.listen((snapshots) async {
-      final userinfis = snapshots.data();
-      userInfo = userinfis!;
+    await doc.listen((snapshots) async {
+      final userinfis = await snapshots.data();
+      userInfo = await userinfis!;
     });
     notifyListeners();
   }
@@ -51,5 +55,13 @@ class MyProfileModel extends ChangeNotifier {
       isUsed = true;
     }
     notifyListeners();
+  }
+
+  Future pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      imageFile = File(pickedFile.path);
+      notifyListeners();
+    }
   }
 }

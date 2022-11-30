@@ -49,7 +49,7 @@ class AddFriendPage extends StatelessWidget {
                           onPressed: () async {
                             try {
                               model.uniquID = controller.text;
-                              await model.getFriendDada(model.uniquID!, uid);
+                              await model.getFriendDada(model.uniquID, uid);
                               await showDialog(
                                   context: context,
                                   builder: ((context) {
@@ -106,7 +106,7 @@ class AddFriendPage extends StatelessWidget {
                                   .showSnackBar(snackBar);
                             }
                           },
-                          child: Text('検索')),
+                          child: const Text('検索')),
                     )
                   ],
                 ),
