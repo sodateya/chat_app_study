@@ -36,6 +36,24 @@ class FriendModel extends ChangeNotifier {
     });
   }
 
+  Future getCacheUserList(String uid) async {
+    var cache = FirebaseFirestore.instance
+        .collection('user')
+        .doc(uid)
+        .collection('friendList');
+    cache.get(const GetOptions(source: Source.cache)).then((doc) {
+      if (doc.docs == null) {
+        throw "data is null !";
+      }
+      final userLists = doc.docs.map((doc) => Friend(doc)).toList();
+      userList = userLists;
+      notifyListeners();
+    }).catchError((error) {
+      print("no cache:  $error");
+      fetchUserList(uid);
+    });
+  }
+
   Future addUserList() async {
     final room = await FirebaseFirestore.instance.collection('rooms').add({
       'createdAt': Timestamp.now(),

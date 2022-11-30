@@ -1,9 +1,12 @@
-import 'package:chat_app_study/presentation/home/home_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'home_model.dart';
+
+// ignore: must_be_immutable
 class Home extends StatelessWidget {
   const Home({super.key});
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -11,7 +14,10 @@ class Home extends StatelessWidget {
       value: HomeModel(),
       child: Consumer<HomeModel>(builder: (context, model, child) {
         return Scaffold(
-            body: model.screens[model.selectedIndex],
+            body: IndexedStack(
+              index: model.selectedIndex,
+              children: model.screens,
+            ),
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: model.selectedIndex,
               onTap: model.onItemTapped,
