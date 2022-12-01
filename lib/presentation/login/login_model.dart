@@ -14,6 +14,13 @@ class LoginModel extends ChangeNotifier {
   late UserCredential result;
   late User user;
   late String name;
+  bool agreeToTerms = false;
+
+  void isAgreeToTerms(bool? value) {
+    agreeToTerms = value ?? false;
+    notifyListeners();
+  }
+
   String randomString(int length) {
     String randomStr = "";
     var random = math.Random();

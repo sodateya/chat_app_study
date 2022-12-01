@@ -9,6 +9,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 import 'email_check.dart';
+import 'forgot_email_address.dart';
+import 'forgot_password.dart';
+import 'inquiry_otoiawase.dart';
 import 'login_model.dart';
 
 class Login extends StatelessWidget {
@@ -26,69 +29,284 @@ class Login extends StatelessWidget {
         value: LoginModel(),
         child: Consumer<LoginModel>(builder: (context, model, child) {
           return Scaffold(
-            backgroundColor: const Color(0xffFCFAF2),
             body: GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        // メールアドレスの入力フォーム
-                        Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(25.0, 0, 25.0, 0),
-                            child: TextFormField(
-                              decoration:
-                                  const InputDecoration(labelText: "メールアドレス"),
-                              onChanged: (String value) {
-                                login_Email = value;
-                              },
-                            )),
+              onTap: () {
+                primaryFocus?.unfocus();
+              },
+              child: SingleChildScrollView(
+                child: SafeArea(
+                    child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 64),
+                  child: DefaultTextStyle(
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              const SizedBox(height: 60),
 
-                        // パスワードの入力フォーム
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(25.0, 0, 25.0, 10.0),
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                                labelText: "パスワード（8～20文字）"),
-                            obscureText: true, // パスワードが見えないようRにする
-                            maxLength: 20, // 入力可能な文字数
-                            onChanged: (String value) {
-                              login_Password = value;
-                            },
-                          ),
-                        ),
+                              Text("LOGO",
+                                  style: TextStyle(
+                                      fontSize: 60.0,
+                                      fontWeight: FontWeight.bold,
+                                      foreground: Paint()
+                                        ..shader = LinearGradient(
+                                          colors: <Color>[
+                                            Colors.pinkAccent.shade400,
 
-                        // ログイン失敗時のエラーメッセージ
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(20.0, 0, 20.0, 5.0),
-                          child: Text(
-                            model.infoText,
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        ),
+                                            Colors.pinkAccent.shade100,
 
-                        // ログインボタンの配置
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ButtonTheme(
-                              minWidth: size.width * 0.45,
-                              // height: 100.0,
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                            //add more color here.
+                                          ],
+                                        ).createShader(Rect.fromLTWH(
+                                            0.0, 0.0, 200.0, 100.0)))),
+
+                              // メールアドレスの入力フォーム
+
+                              const SizedBox(height: 40),
+                              TextFormField(
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: const InputDecoration(
+                                  labelStyle: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                  labelText: 'メールアドレス',
+                                ),
+                                onChanged: (String value) {
+                                  login_Email = value;
+                                },
+                              ),
+                              const SizedBox(height: 24),
+                              TextFormField(
+                                // パスワードを非表示にする
+                                obscureText: true,
+                                keyboardType: TextInputType.visiblePassword,
+
+                                decoration: const InputDecoration(
+                                  labelStyle: TextStyle(fontSize: 12),
+                                  labelText: 'パスワード',
+                                ),
+                                onChanged: (String value) {
+                                  login_Password = value;
+                                },
+                              ),
+                              const SizedBox(height: 24),
+
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    20.0, 0, 20.0, 5.0),
+                                child: Text(
+                                  model.infoText,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 32,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Checkbox(
+                                      value: model.agreeToTerms,
+                                      onChanged: (value) {
+                                        model.isAgreeToTerms(value);
+                                      },
+                                    ),
+                                    // TODO(kenta-wakasa): ご利用規約ページに遷移する
+                                    const Text(
+                                      'ご利用規約',
+                                      style: TextStyle(
+                                        height: 1,
                                       ),
-                                      primary: Colors.blue[50]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  clipBehavior: Clip.antiAlias,
+                                  onPressed: () async {
+                                    try {
+                                      // メール/パスワードでログイン
+                                      model.result = await model.auth
+                                          .signInWithEmailAndPassword(
+                                        email: login_Email,
+                                        password: login_Password,
+                                      );
+                                      final isFirstLogin = model
+                                          .result.additionalUserInfo!.isNewUser;
 
-                                  // ボタンクリック後にアカウント作成用の画面の遷移する。
-                                  onPressed: () {
-                                    Navigator.of(context).push(
+                                      // ログイン成功
+                                      model.user =
+                                          model.result.user!; // ログインユーザーのIDを取得
+
+                                      // Email確認が済んでいる場合のみHome画面へ
+                                      if (isFirstLogin) {
+                                        if (model.user.emailVerified) {
+                                          await model
+                                              .createUserDatabase(model.user);
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Home(),
+                                              ));
+                                        } else {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Emailcheck(
+                                                      email: login_Email,
+                                                      pswd: login_Password,
+                                                      from: 2,
+                                                    )),
+                                          );
+                                        }
+                                      } else {
+                                        if (model.user.emailVerified) {
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Home(),
+                                              ));
+                                        } else {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Emailcheck(
+                                                      email: login_Email,
+                                                      pswd: login_Password,
+                                                      from: 2,
+                                                    )),
+                                          );
+                                        }
+                                      }
+                                    } catch (e) {
+                                      print(e);
+                                      // ログインに失敗した場合
+                                      model.loginErrorMessage(e);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                  ),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.deepPurple.shade200,
+                                            Colors.deepPurpleAccent,
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 15,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Text('メールアドレス'),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  clipBehavior: Clip.antiAlias,
+                                  onPressed: () async {
+                                    googleUser =
+                                        (await GoogleSignIn().signIn())!;
+                                    googleAuth =
+                                        await googleUser.authentication;
+                                    credential = GoogleAuthProvider.credential(
+                                      accessToken: googleAuth.accessToken,
+                                      idToken: googleAuth.idToken,
+                                    );
+                                    try {
+                                      final result = await model.auth
+                                          .signInWithCredential(credential);
+                                      final isFirstLogin =
+                                          result.additionalUserInfo!.isNewUser;
+                                      if (isFirstLogin) {
+                                        final user = result.user;
+                                        await model.createUserDatabase(user!);
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Home(),
+                                            ));
+                                      } else {
+                                        final user = result.user;
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Home(),
+                                            ));
+                                      }
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                  ),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.lightBlue.shade400,
+                                            Colors.lightBlue.shade700,
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 15,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Text('Googleログイン'),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  clipBehavior: Clip.antiAlias,
+                                  onPressed: () async {
+                                    await Navigator.of(context).push(
                                       MaterialPageRoute(
                                         fullscreenDialog: true,
                                         builder: (BuildContext context) =>
@@ -96,150 +314,88 @@ class Login extends StatelessWidget {
                                       ),
                                     );
                                   },
-                                  child: const Text(
-                                    'アカウントを作成する',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue),
-                                  )),
-                            ),
-                            ButtonTheme(
-                              minWidth: size.width * 0.45,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
                                   ),
-                                  primary: const Color(0xff39bdcc),
-                                ),
-
-                                onPressed: () async {
-                                  try {
-                                    // メール/パスワードでログイン
-                                    model.result = await model.auth
-                                        .signInWithEmailAndPassword(
-                                      email: login_Email,
-                                      password: login_Password,
-                                    );
-                                    final isFirstLogin = model
-                                        .result.additionalUserInfo!.isNewUser;
-
-                                    // ログイン成功
-                                    model.user =
-                                        model.result.user!; // ログインユーザーのIDを取得
-
-                                    // Email確認が済んでいる場合のみHome画面へ
-                                    if (isFirstLogin) {
-                                      if (model.user.emailVerified) {
-                                        await model
-                                            .createUserDatabase(model.user);
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Home(),
-                                            ));
-                                      } else {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Emailcheck(
-                                                    email: login_Email,
-                                                    pswd: login_Password,
-                                                    from: 2,
-                                                  )),
-                                        );
-                                      }
-                                    } else {
-                                      if (model.user.emailVerified) {
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Home(),
-                                            ));
-                                      } else {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Emailcheck(
-                                                    email: login_Email,
-                                                    pswd: login_Password,
-                                                    from: 2,
-                                                  )),
-                                        );
-                                      }
-                                    }
-                                  } catch (e) {
-                                    print(e);
-                                    // ログインに失敗した場合
-                                    model.loginErrorMessage(e);
-                                  }
-                                },
-
-                                // ボタン内の文字や書式
-                                child: const Text(
-                                  'ログイン',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.grey.shade300,
+                                            Colors.grey.shade300,
+                                            Colors.grey.shade300,
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Container(
+                                        // 上と下は余白なし
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 15,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          '新規登録',
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        // ログイン失敗時のエラーメッセージ
-                        TextButton(
-                          child: const Text('上記メールアドレスにパスワード再設定メールを送信'),
-                          onPressed: () => model.auth
-                              .sendPasswordResetEmail(email: login_Email),
-                        ),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SignInButton(
-                              Buttons.Google,
-                              text: 'Googleサインイン',
-                              onPressed: () async {
-                                googleUser = (await GoogleSignIn().signIn())!;
-                                googleAuth = await googleUser.authentication;
-                                credential = GoogleAuthProvider.credential(
-                                  accessToken: googleAuth.accessToken,
-                                  idToken: googleAuth.idToken,
-                                );
-                                try {
-                                  final result = await model.auth
-                                      .signInWithCredential(credential);
-                                  final isFirstLogin =
-                                      result.additionalUserInfo!.isNewUser;
-                                  if (isFirstLogin) {
-                                    final user = result.user;
-                                    await model.createUserDatabase(user!);
-                                    await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Home(),
-                                        ));
-                                  } else {
-                                    final user = result.user;
-                                    await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Home(),
-                                        ));
-                                  }
-                                } catch (e) {
-                                  print(e);
-                                }
-                              },
-                            ),
-                          ],
+                              const SizedBox(height: 30),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ForgotPassword(),
+                                    ),
+                                  );
+                                },
+                                child: const Text('パスワードを忘れた方はこちら'),
+                              ),
+                              const SizedBox(height: 16),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ForgotEmailAddress(),
+                                    ),
+                                  );
+                                },
+                                child: const Text('メールアドレスを忘れた方はお問合せください'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => Inquiry(),
+                                    ),
+                                  );
+                                },
+                                child: const Text('お問合せ'),
+                              ),
+                              // TextButton(
+                              //   child: const Text('上記メールアドレスにパスワード再設定メールを送信'),
+                              //   onPressed: () => model.auth
+                              //       .sendPasswordResetEmail(email: login_Email),
+                              // ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                )),
               ),
             ),
           );

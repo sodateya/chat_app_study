@@ -24,6 +24,7 @@ class FriendModel extends ChangeNotifier {
   }
 
   Future fetchUserList(String uid) async {
+    //firestoreからデータ取得
     final doc = await FirebaseFirestore.instance
         .collection('user')
         .doc(uid)
@@ -37,6 +38,7 @@ class FriendModel extends ChangeNotifier {
   }
 
   Future getCacheUserList(String uid) async {
+    //uid=自分のUID  キャッシュからデータを取得（26行目）
     var cache = FirebaseFirestore.instance
         .collection('user')
         .doc(uid)
@@ -44,11 +46,12 @@ class FriendModel extends ChangeNotifier {
     cache.get(const GetOptions(source: Source.cache)).then((doc) {
       if (doc.docs == null) {
         throw "data is null !";
-      }
+      } //
       final userLists = doc.docs.map((doc) => Friend(doc)).toList();
       userList = userLists;
       notifyListeners();
     }).catchError((error) {
+      //キャッシュにデータがなかったら fetchUserList(uid);
       print("no cache:  $error");
       fetchUserList(uid);
     });

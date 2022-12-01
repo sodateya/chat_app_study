@@ -18,7 +18,8 @@ class FriendPage extends StatelessWidget {
     void getMore() async {}
 
     return ChangeNotifierProvider.value(
-        value: FriendModel()..getCacheUserList(uid),
+        value: FriendModel()
+          ..getCacheUserList(uid), //FriendMdelを使って..getCacheUserListでUserの情報をとる
         child: Consumer<FriendModel>(builder: (context, model, child) {
           final friends = model.userList;
           return Scaffold(
