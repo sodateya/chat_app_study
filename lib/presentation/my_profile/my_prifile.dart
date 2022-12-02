@@ -7,13 +7,13 @@ class MyProfilePage extends StatelessWidget {
   String uid;
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return ChangeNotifierProvider.value(
       value: MyProfileModel()..getMyData(uid),
       child: Consumer<MyProfileModel>(builder: (context, model, child) {
+        final size = MediaQuery.of(context).size;
         return Scaffold(
             appBar: AppBar(
-              title: Text('マイページ'),
+              title: const Text('マイページ'),
             ),
             body: SizedBox(
               width: size.width,

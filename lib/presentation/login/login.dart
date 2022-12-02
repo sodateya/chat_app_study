@@ -4,7 +4,6 @@ import 'package:chat_app_study/presentation/home/home.dart';
 import 'package:chat_app_study/presentation/login/registration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +19,9 @@ class Login extends StatelessWidget {
   late AuthCredential credential;
 
   String login_Email = ""; // 入力されたメールアドレス
-  String login_Password = ""; // 入力されたパスワード
+  String login_Password = "";
+
+  Login({super.key}); // 入力されたパスワード
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class Login extends StatelessWidget {
 
                                             //add more color here.
                                           ],
-                                        ).createShader(Rect.fromLTWH(
+                                        ).createShader(const Rect.fromLTWH(
                                             0.0, 0.0, 200.0, 100.0)))),
 
                               // メールアドレスの入力フォーム

@@ -36,6 +36,8 @@ class Authentication_error {
     } else if (errorCode == 'error') {
       // メールアドレスかパスワードがEmpty or Nullの場合
       errorMsg = 'メールアドレスとパスワードを入力してください。';
+    } else if (errorCode == 'network-request-failed') {
+      errorMsg = 'ネットワーク接続を確認してください';
     } else {
       errorMsg = errorCode;
     }

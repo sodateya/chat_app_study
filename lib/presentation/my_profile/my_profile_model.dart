@@ -22,8 +22,8 @@ class MyProfileModel extends ChangeNotifier {
     await doc.listen((snapshots) async {
       final userinfis = await snapshots.data();
       userInfo = await userinfis!;
+      notifyListeners();
     });
-    notifyListeners();
   }
 
   Future updataUniquID(String uid) async {

@@ -9,7 +9,6 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return ChangeNotifierProvider.value(
       value: HomeModel(),
       child: Consumer<HomeModel>(builder: (context, model, child) {
