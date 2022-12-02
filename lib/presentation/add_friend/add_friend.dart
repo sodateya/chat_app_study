@@ -53,6 +53,7 @@ class AddFriendPage extends StatelessWidget {
                           child: ElevatedButton(
                               onPressed: () async {
                                 try {
+                                  print(model.uniquID);
                                   model.uniquID = controller.text;
                                   await model.getFriendDada(model.uniquID, uid);
                                   await showDialog(

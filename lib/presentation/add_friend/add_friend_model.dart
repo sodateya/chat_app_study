@@ -62,6 +62,9 @@ class AddFriendModel extends ChangeNotifier {
   Future addFiriend(Map<String, dynamic> friendData, String uid) async {
     final room = await FirebaseFirestore.instance.collection('rooms').add({
       'createdAt': Timestamp.now(),
+      'updateAt': Timestamp.now(),
+      'lastComment': '',
+      'member': [uid, friendData['uid']]
     });
     await FirebaseFirestore.instance
         .collection('user')

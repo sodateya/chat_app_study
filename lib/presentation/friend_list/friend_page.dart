@@ -45,8 +45,19 @@ class FriendPage extends StatelessWidget {
               ],
             ),
             body: friends.isEmpty
-                ? const Center(
-                    child: Text('現在友達はいません'),
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Center(
+                        child: Text('現在友達はいません'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          model.getCacheUserList(uid);
+                        },
+                        child: const Text('再読み込み'),
+                      )
+                    ],
                   )
                 : SizedBox(
                     width: size.width,

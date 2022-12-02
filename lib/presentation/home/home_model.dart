@@ -2,7 +2,6 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../add_friend/add_friend.dart';
 import '../apply_list/apply_list.dart';
 import '../friend_list/friend_page.dart';
 import '../setting/setting.dart';
