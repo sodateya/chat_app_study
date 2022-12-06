@@ -7,5 +7,9 @@ class TalkModel extends ChangeNotifier {
   final firestore = FirebaseFirestore.instance;
   int documentLimit = 13;
   late DocumentSnapshot lastDocument;
-  late String comment;
+  late String message;
+
+  Future getTalk() async {
+    print('get');
+  }
 }

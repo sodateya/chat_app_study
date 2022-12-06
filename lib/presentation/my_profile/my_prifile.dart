@@ -13,7 +13,15 @@ class MyProfilePage extends StatelessWidget {
         final size = MediaQuery.of(context).size;
         return Scaffold(
             appBar: AppBar(
-              title: const Text('マイページ'),
+              title: const Text('プロフィール編集'),
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                  Color(0xff8171D3),
+                  Color(0xff9DD3E4)
+                ] //グラデーションの設定
+                        )),
+              ),
             ),
             body: SizedBox(
               width: size.width,

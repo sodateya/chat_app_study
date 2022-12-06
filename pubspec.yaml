@@ -25,6 +25,11 @@ dependencies:
   firebase_storage: ^11.0.6
   image_picker: ^0.8.6
   new_gradient_app_bar: ^0.2.0
+  cloud_functions: ^4.0.5
+  flutter_picker: ^2.0.5
+  flutter_cache_manager: ^3.3.0
+  flutter_chat_ui: ^1.6.6
+  bottom_sheet_bar: ^2.3.8
 
 
 dev_dependencies:
