@@ -25,7 +25,6 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return ChangeNotifierProvider.value(
         value: LoginModel(),
         child: Consumer<LoginModel>(builder: (context, model, child) {
@@ -250,7 +249,8 @@ class Login extends StatelessWidget {
                                           result.additionalUserInfo!.isNewUser;
                                       if (isFirstLogin) {
                                         final user = result.user;
-                                        await model.createUserDatabase(user!);
+                                        await model
+                                            .createUserDatabaseForGoogle(user!);
                                         await Navigator.push(
                                             context,
                                             MaterialPageRoute(

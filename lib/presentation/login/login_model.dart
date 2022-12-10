@@ -64,6 +64,18 @@ class LoginModel extends ChangeNotifier {
     });
   }
 
+  Future createUserDatabaseForGoogle(User user) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    FirebaseFirestore.instance.collection('user').doc(user.uid).set({
+      'uid': user.uid,
+      'photUrl': user.photoURL,
+      'name': user.displayName,
+      'RQpass': randomString(20),
+      'uniquID': '',
+      'pushToken': token
+    });
+  }
+
   // Future lunchTermsOfService() async {
   //   await launch('https://hz-360fa.web.app/');
   //   notifyListeners();

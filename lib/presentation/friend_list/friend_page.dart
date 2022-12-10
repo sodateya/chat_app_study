@@ -13,14 +13,18 @@ class FriendPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     ScrollController scrollController = ScrollController();
-    void getMore() async {}
 
     return ChangeNotifierProvider.value(
         value: FriendModel()
           ..getCacheUserList(uid), //FriendMdelを使って..getCacheUserListでUserの情報をとる
         child: Consumer<FriendModel>(builder: (context, model, child) {
+          void getMore() async {
+            print('getMore');
+          }
+
+          final size = MediaQuery.of(context).size;
+
           final friends = model.userList;
           return Scaffold(
             appBar: AppBar(
@@ -81,12 +85,11 @@ class FriendPage extends StatelessWidget {
                               height: size.height * 0.8,
                               width: size.width * 0.97,
                               child: ListView.builder(
-                                controller: scrollController
-                                  ..addListener(getMore),
+                                controller: scrollController,
                                 itemCount: friends.length,
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  return UserTile(friends[index]);
+                                  return UserTile(friends[index], uid, size);
                                 },
                               ),
                             ),
@@ -101,9 +104,10 @@ class FriendPage extends StatelessWidget {
 }
 
 class UserTile extends StatelessWidget {
-  UserTile(this.friends, {Key? key}) : super(key: key);
+  UserTile(this.friends, this.uid, this.size, {Key? key}) : super(key: key);
   Friend friends;
-
+  String uid;
+  Size size;
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -172,6 +176,8 @@ class UserTile extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (context) => TalkPage(
                                       roomID: friends.roomId,
+                                      uid: uid,
+                                      size: size,
                                     )));
                         print('トーク画面へ');
                         break;
