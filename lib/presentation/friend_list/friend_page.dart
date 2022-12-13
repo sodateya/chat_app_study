@@ -178,6 +178,7 @@ class UserTile extends StatelessWidget {
                                       roomID: friends.roomId,
                                       uid: uid,
                                       size: size,
+                                      userInfo: model.userInfo,
                                     )));
                         print('トーク画面へ');
                         break;
