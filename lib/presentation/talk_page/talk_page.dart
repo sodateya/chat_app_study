@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable, missing_return, use_build_context_synchronously
 
 import 'dart:math';
-
 import 'package:chat_app_study/domain/talk.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_model.dart';
 import 'package:flutter/material.dart';
@@ -117,7 +116,9 @@ class TalkPage extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.photo_camera,
                                 color: Colors.blueAccent),
-                            onPressed: () {},
+                            onPressed: () async {
+                              await model.pickImage();
+                            },
                           ),
                           Expanded(
                             child: Container(
@@ -164,7 +165,21 @@ class TalkPage extends StatelessWidget {
                             icon: const Icon(Icons.send,
                                 color: Colors.blueAccent),
                             onPressed: () async {
-                              await model.addMessage(roomID, uid);
+                              try {
+                                await model.addMessage(roomID, uid);
+                              } catch (e) {
+                                final snackBar = SnackBar(
+                                  backgroundColor: Colors.redAccent,
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: const Duration(milliseconds: 800),
+                                  margin: const EdgeInsets.only(
+                                    bottom: 40,
+                                  ),
+                                  content: Text(e.toString()),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
                               commentController.clear();
                               model.message = '';
                               model.imgURL = '';

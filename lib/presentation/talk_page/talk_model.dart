@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../domain/talk.dart';
 
 class TalkModel extends ChangeNotifier {
@@ -49,5 +52,15 @@ class TalkModel extends ChangeNotifier {
       'imgURL': imgURL,
       'read': [uid]
     });
+  }
+
+  File? imageFile;
+  final picker = ImagePicker();
+
+  Future pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    imageFile = File(pickedFile!.path);
+    print(imageFile);
+    notifyListeners();
   }
 }
