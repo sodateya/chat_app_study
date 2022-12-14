@@ -62,6 +62,7 @@ class ApplyListModel extends ChangeNotifier {
         .collection('friendList')
         .doc(myID)
         .update({'applyState': '拒否'});
+
     notifyListeners();
   }
 

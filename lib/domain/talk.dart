@@ -10,6 +10,7 @@ class Talk {
     message = doc['message'];
     imgURL = doc['imgURL'];
     read = doc['read'];
+    id = doc.id;
   }
   late List read;
   late String uid;
@@ -17,4 +18,5 @@ class Talk {
   late DateTime updateAt;
   late String message;
   late String imgURL;
+  late String id;
 }

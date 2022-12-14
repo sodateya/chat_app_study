@@ -72,7 +72,7 @@ class TalkPage extends StatelessWidget {
                           physics: const AlwaysScrollableScrollPhysics(),
                           itemBuilder: (ctx, index) {
                             return talks[index].uid == uid
-                                ? myTalk(context, size, talks[index])
+                                ? myTalk(size, talks[index])
                                 : IntrinsicHeight(
                                     child: Row(
                                       children: [
@@ -100,7 +100,8 @@ class TalkPage extends StatelessWidget {
                                                 height: size.width * 0.1,
                                                 width: size.width * 0.1,
                                               ),
-                                        otherTalk(context, size, talks[index]),
+                                        otherTalk(
+                                            size, talks[index], roomID, uid),
                                       ],
                                     ),
                                   );
@@ -181,66 +182,76 @@ class TalkPage extends StatelessWidget {
   }
 }
 
-Widget otherTalk(BuildContext context, Size size, Talk talk) {
-  return Padding(
-    padding: const EdgeInsets.all(10.0),
-    child: SizedBox(
-      width: size.width * 0.6,
-      child: IntrinsicHeight(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [
-                    Color(0xffE96B6D),
-                    Color(0xffEF995F)
-                  ] //グラデーションの設定
+Widget otherTalk(Size size, Talk talk, String roomID, String uid) {
+  return ChangeNotifierProvider.value(
+      value: TalkModel(),
+      child: Consumer<TalkModel>(builder: (context, model, child) {
+        if (talk.read.contains(uid)) {
+        } else {
+          model.read(roomID, uid, talk.id);
+          print('既読');
+        }
+        return Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: SizedBox(
+            width: size.width * 0.6,
+            child: IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [
+                          Color(0xffE96B6D),
+                          Color(0xffEF995F)
+                        ] //グラデーションの設定
+                            ),
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color(0xff2d3441),
                       ),
-                  borderRadius: BorderRadius.circular(10),
-                  color: const Color(0xff2d3441),
-                ),
-                child: Text(
-                  talk.message,
-                  textAlign: TextAlign.left,
-                  style: GoogleFonts.sawarabiMincho(
-                    color: const Color(0xffFCFAF2),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.0,
+                      child: Text(
+                        talk.message,
+                        textAlign: TextAlign.left,
+                        style: GoogleFonts.sawarabiMincho(
+                          color: const Color(0xffFCFAF2),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // SizedBox(
+                      //   child: talk.read.length <= 1
+                      //       ? const Text('')
+                      //       : const Text('既読',
+                      //           style: TextStyle(fontSize: 12, color: Colors.grey),
+                      //           textAlign: TextAlign.left),
+                      // ),
+                      SizedBox(
+                        child: Text(DateFormat('HH:mm').format(talk.createdAt),
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
+                            textAlign: TextAlign.left),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
-            const SizedBox(
-              width: 8,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // SizedBox(
-                //   child: talk.read.length <= 1
-                //       ? const Text('')
-                //       : const Text('既読',
-                //           style: TextStyle(fontSize: 12, color: Colors.grey),
-                //           textAlign: TextAlign.left),
-                // ),
-                SizedBox(
-                  child: Text(DateFormat('HH:mm').format(talk.createdAt),
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      textAlign: TextAlign.left),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    ),
-  );
+          ),
+        );
+      }));
 }
 
-Widget myTalk(BuildContext context, Size size, Talk talk) {
+Widget myTalk(Size size, Talk talk) {
   return Padding(
     padding: const EdgeInsets.all(10.0),
     child: Row(

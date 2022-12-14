@@ -7,13 +7,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+List<Friend> userList = [];
+
 class FriendModel extends ChangeNotifier {
   List<Friend> userList = [];
   Map<String, dynamic> userInfo = {};
 
   final firestore = FirebaseFirestore.instance;
+
   Future getUserList(String uid) async {
-    final doc = await FirebaseFirestore.instance
+    final doc = await firestore
         .collection('user')
         .doc(uid)
         .collection('friendList')
@@ -25,7 +28,7 @@ class FriendModel extends ChangeNotifier {
 
   Future fetchUserList(String uid) async {
     //firestoreからデータ取得
-    final doc = await FirebaseFirestore.instance
+    final doc = await firestore
         .collection('user')
         .doc(uid)
         .collection('friendList')

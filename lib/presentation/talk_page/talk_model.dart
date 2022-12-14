@@ -10,7 +10,6 @@ class TalkModel extends ChangeNotifier {
   late DocumentSnapshot lastDocument;
   String message = '';
   String imgURL = '';
-
   Future getTalk(String roomID) async {
     print('get');
     final doc = firebase
@@ -24,6 +23,18 @@ class TalkModel extends ChangeNotifier {
       talks = talk;
       notifyListeners();
     });
+  }
+
+  Future read(String roomID, String uid, String id) async {
+    await FirebaseFirestore.instance
+        .collection('rooms')
+        .doc(roomID)
+        .collection('talks')
+        .doc(id)
+        .update({
+      'read': FieldValue.arrayUnion([uid])
+    });
+    print(id);
   }
 
   Future addMessage(String roomID, String uid) async {
