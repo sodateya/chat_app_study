@@ -2,12 +2,14 @@
 
 import 'dart:math';
 import 'package:chat_app_study/domain/talk.dart';
+import 'package:chat_app_study/presentation/talk_page/picture_page.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //File imageFile;
 
@@ -111,81 +113,122 @@ class TalkPage extends StatelessWidget {
                     Container(
                       alignment: Alignment.bottomCenter,
                       margin: const EdgeInsets.all(15.0),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.photo_camera,
-                                color: Colors.blueAccent),
-                            onPressed: () async {
-                              await model.pickImage();
-                            },
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(35.0),
-                                // ignore: prefer_const_literals_to_create_immutables
-                                boxShadow: [
-                                  const BoxShadow(
-                                      offset: Offset(0, 3),
-                                      blurRadius: 5,
-                                      color: Colors.grey)
-                                ],
-                              ),
-                              child: Row(
-                                // ignore: prefer_const_literals_to_create_immutables
-                                children: [
-                                  Expanded(
-                                    child: Scrollbar(
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 15),
-                                        child: TextField(
-                                          maxLines: 10,
-                                          minLines: 1,
-                                          onChanged: (value) {
-                                            model.message = value;
-                                          },
-                                          controller: commentController,
-                                          decoration: const InputDecoration(
-                                              hintText: "メッセージを入力...",
-                                              hintStyle: TextStyle(
-                                                  color: Colors.blueAccent),
-                                              border: InputBorder.none),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.photo_camera,
+                                      color: Colors.blueAccent),
+                                  onPressed: () async {
+                                    await model
+                                        .pickImage()
+                                        .then((value) => value != null
+                                            ? Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PicturePage(
+                                                    imageFile: model.imageFile,
+                                                    size: size,
+                                                    roomID: roomID,
+                                                    uid: uid,
+                                                  ),
+                                                  fullscreenDialog: true,
+                                                ))
+                                            : print(value));
+                                  },
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(35.0),
+                                  // ignore: prefer_const_literals_to_create_immutables
+                                  boxShadow: [
+                                    const BoxShadow(
+                                        offset: Offset(0, 3),
+                                        blurRadius: 5,
+                                        color: Colors.grey)
+                                  ],
+                                ),
+                                child: Row(
+                                  // ignore: prefer_const_literals_to_create_immutables
+                                  children: [
+                                    Expanded(
+                                        child: Column(
+                                      children: [
+                                        Scrollbar(
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 15),
+                                            child: TextField(
+                                              maxLines: 10,
+                                              minLines: 1,
+                                              onChanged: (value) {
+                                                model.message = value;
+                                              },
+                                              controller: commentController,
+                                              decoration: const InputDecoration(
+                                                  hintText: "メッセージを入力...",
+                                                  hintStyle: TextStyle(
+                                                      color: Colors.blueAccent),
+                                                  border: InputBorder.none),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                      ],
+                                    )),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.send,
-                                color: Colors.blueAccent),
-                            onPressed: () async {
-                              try {
-                                await model.addMessage(roomID, uid);
-                              } catch (e) {
-                                final snackBar = SnackBar(
-                                  backgroundColor: Colors.redAccent,
-                                  behavior: SnackBarBehavior.floating,
-                                  duration: const Duration(milliseconds: 800),
-                                  margin: const EdgeInsets.only(
-                                    bottom: 40,
-                                  ),
-                                  content: Text(e.toString()),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                              }
-                              commentController.clear();
-                              model.message = '';
-                              model.imgURL = '';
-                            },
-                          )
-                        ],
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                model.isSending == false
+                                    ? IconButton(
+                                        icon: const Icon(Icons.send,
+                                            color: Colors.blueAccent),
+                                        onPressed: () async {
+                                          try {
+                                            model.startSend();
+                                            await model.addMessage(roomID, uid);
+                                          } catch (e) {
+                                            print(e);
+                                            final snackBar = SnackBar(
+                                              backgroundColor: Colors.redAccent,
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              duration: const Duration(
+                                                  milliseconds: 1000),
+                                              margin: const EdgeInsets.only(
+                                                bottom: 40,
+                                              ),
+                                              content: Text(
+                                                e.toString(),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            );
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          } finally {
+                                            model.endSend();
+                                          }
+                                          commentController.clear();
+                                          model.message = '';
+                                          model.imageFile = null;
+                                        },
+                                      )
+                                    : const SizedBox.shrink(),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -215,27 +258,62 @@ Widget otherTalk(Size size, Talk talk, String roomID, String uid) {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [
-                          Color(0xffE96B6D),
-                          Color(0xffEF995F)
-                        ] //グラデーションの設定
+                    child: talk.message != ''
+                        ? Container(
+                            padding: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(colors: [
+                                Color(0xffE96B6D),
+                                Color(0xffEF995F)
+                              ] //グラデーションの設定
+                                  ),
+                              borderRadius: BorderRadius.circular(10),
+                              color: const Color(0xff2d3441),
                             ),
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color(0xff2d3441),
-                      ),
-                      child: Text(
-                        talk.message,
-                        textAlign: TextAlign.left,
-                        style: GoogleFonts.sawarabiMincho(
-                          color: const Color(0xffFCFAF2),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    ),
+                            child: Text(
+                              talk.message,
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                color: Color(0xffFCFAF2),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.0,
+                              ),
+                            ))
+                        : GestureDetector(
+                            onTap: () async {
+                              await launch(talk.imgURL);
+                            },
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                  maxWidth: 150.0, maxHeight: 200.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.network(
+                                  talk.imgURL,
+                                  fit: BoxFit.fill,
+                                  loadingBuilder: (
+                                    BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent?
+                                        loadingProgress, // ImageChunkEventに「?」が必要です。
+                                  ) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes! //expectedTotalBytesはint?型なので「!」が必要です。
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )),
                   ),
                   const SizedBox(
                     width: 8,
@@ -243,13 +321,6 @@ Widget otherTalk(Size size, Talk talk, String roomID, String uid) {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      // SizedBox(
-                      //   child: talk.read.length <= 1
-                      //       ? const Text('')
-                      //       : const Text('既読',
-                      //           style: TextStyle(fontSize: 12, color: Colors.grey),
-                      //           textAlign: TextAlign.left),
-                      // ),
                       SizedBox(
                         child: Text(DateFormat('HH:mm').format(talk.createdAt),
                             style: const TextStyle(
@@ -301,27 +372,63 @@ Widget myTalk(Size size, Talk talk) {
                   width: 8,
                 ),
                 Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.all(5.0),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [
-                        Color(0xffB08BD3),
-                        Color(0xff6A75BD)
-                      ] //グラデーションの設定
+                  child: talk.message != ''
+                      ? Container(
+                          padding: const EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [
+                              Color(0xffB08BD3),
+                              Color(0xff6A75BD)
+                            ] //グラデーションの設定
+                                ),
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color(0xff2d3441),
                           ),
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xff2d3441),
-                    ),
-                    child: Text(
-                      talk.message,
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.sawarabiMincho(
-                        color: const Color(0xffFCFAF2),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.0,
-                      ),
-                    ),
-                  ),
+                          child: Text(
+                            talk.message,
+                            textAlign: TextAlign.left,
+                            style: const TextStyle(
+                              color: Color(0xffFCFAF2),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () async {
+                            await launch(talk.imgURL);
+                          },
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                                maxWidth: 150.0, maxHeight: 200.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                talk.imgURL,
+                                fit: BoxFit.fill,
+                                loadingBuilder: (
+                                  BuildContext context,
+                                  Widget child,
+                                  ImageChunkEvent?
+                                      loadingProgress, // ImageChunkEventに「?」が必要です。
+                                ) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress
+                                                  .expectedTotalBytes !=
+                                              null
+                                          ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes! //expectedTotalBytesはint?型なので「!」が必要です。
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          )),
                 ),
               ],
             ),

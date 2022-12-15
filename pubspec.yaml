@@ -26,6 +26,7 @@ dependencies:
   flutter_cache_manager: ^3.3.0
   flutter_chat_ui: ^1.6.6
   bottom_sheet_bar: ^2.3.8
+  image: ^3.2.2
 
 
 dev_dependencies:
