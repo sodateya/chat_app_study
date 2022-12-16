@@ -10,6 +10,7 @@ import 'dart:math' as Math;
 
 class TalkModel extends ChangeNotifier {
   List<Talk> talks = [];
+  List<Talk> images = [];
   final firestore = FirebaseFirestore.instance;
   int documentLimit = 13;
   final firebase = FirebaseFirestore.instance;
@@ -49,6 +50,22 @@ class TalkModel extends ChangeNotifier {
     });
   }
 
+  Future getPicture(String roomID) async {
+    final doc = firebase
+        .collection('rooms')
+        .doc(roomID)
+        .collection('talks')
+        .where('message', whereIn: [''])
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+    doc.listen((snapshots) async {
+      final image = snapshots.docs.map((doc) => Talk(doc)).toList();
+      images = image;
+      print(image.length);
+      notifyListeners();
+    });
+  }
+
   Future read(String roomID, String uid, String id) async {
     await FirebaseFirestore.instance
         .collection('rooms')
@@ -58,7 +75,6 @@ class TalkModel extends ChangeNotifier {
         .update({
       'read': FieldValue.arrayUnion([uid])
     });
-    print(id);
   }
 
   Future addMessage(String roomID, String uid) async {
@@ -107,12 +123,8 @@ class TalkModel extends ChangeNotifier {
 
   Future pickImage() async {
     final pickedFile = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-        maxHeight: 400,
-        maxWidth: 400);
+        source: ImageSource.gallery, maxHeight: 400, maxWidth: 400);
     imageFile = File(pickedFile!.path);
-    print(imageFile);
     return imageFile;
   }
 }

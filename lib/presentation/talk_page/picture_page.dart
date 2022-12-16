@@ -31,16 +31,25 @@ class PicturePage extends StatelessWidget {
           model.imageFile = imageFile;
           return Scaffold(
             backgroundColor: Colors.black,
-            appBar: AppBar(
-              backgroundColor: Colors.black12,
-            ),
             body: Stack(
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 50, left: 20),
+                  child: IconButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(
+                        Icons.clear,
+                        color: Colors.white,
+                        size: 35,
+                      )),
+                ),
                 Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                        minWidth: size.width - 200,
-                        minHeight: size.height - 200),
+                        minWidth: size.width - 250,
+                        minHeight: size.height - 250),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.file(

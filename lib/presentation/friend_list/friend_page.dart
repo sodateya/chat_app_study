@@ -1,4 +1,5 @@
 import 'package:chat_app_study/domain/friend.dart';
+import 'package:chat_app_study/domain/user.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,10 +15,12 @@ class FriendPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
+    ScrollController scrollController2 = ScrollController();
 
     return ChangeNotifierProvider.value(
         value: FriendModel()
-          ..getUserList(uid), //FriendMdelを使って..getCacheUserListでUserの情報をとる
+          ..getUserList(uid)
+          ..fetchAllUserList(), //FriendMdelを使って..getCacheUserListでUserの情報をとる
         child: Consumer<FriendModel>(builder: (context, model, child) {
           void getMore() async {
             print('getMore');
@@ -26,6 +29,7 @@ class FriendPage extends StatelessWidget {
           final size = MediaQuery.of(context).size;
 
           final friends = model.userList;
+          final allUser = model.allUserList;
           return Scaffold(
             appBar: AppBar(
               flexibleSpace: Container(
@@ -72,17 +76,32 @@ class FriendPage extends StatelessWidget {
                     ],
                   )
                 : SizedBox(
-                    width: size.width,
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        RefreshIndicator(
+                          onRefresh: () async {
+                            print('po');
+                          },
+                          child: SizedBox(
+                            height: size.height * 0.1,
+                            child: ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              controller: scrollController2,
+                              itemCount: allUser.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                return IconTile(allUser[index], uid, size);
+                              },
+                            ),
+                          ),
+                        ),
                         Expanded(
                           child: RefreshIndicator(
                             onRefresh: () async {
                               await model.fetchUserList(uid);
                             },
                             child: SizedBox(
-                              height: size.height * 0.8,
+                              height: size.height * 0.654,
                               width: size.width * 0.97,
                               child: ListView.builder(
                                 controller: scrollController,
@@ -195,6 +214,45 @@ class UserTile extends StatelessWidget {
                     }
                   },
                 );
+        }));
+  }
+}
+
+class IconTile extends StatelessWidget {
+  IconTile(this.allUser, this.uid, this.size, {Key? key}) : super(key: key);
+  UserDB allUser;
+  String uid;
+  Size size;
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider.value(
+        value: FriendModel()..getForAllUserInfo(allUser.uid),
+        child: Consumer<FriendModel>(builder: (context, model, child) {
+          return model.allUserInfo.isEmpty
+              ? Container(
+                  alignment: Alignment.center,
+                  width: 50,
+                  height: 50,
+                  child: const CircularProgressIndicator(),
+                )
+              : model.allUserInfo['photUrl'] != null
+                  ? Container(
+                      height: 55,
+                      width: 55,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image:
+                                  NetworkImage(model.allUserInfo['photUrl']))))
+                  : Container(
+                      height: 55,
+                      width: 55,
+                      decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: AssetImage('images/user.png'))));
         }));
   }
 }

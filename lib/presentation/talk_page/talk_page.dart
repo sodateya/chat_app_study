@@ -2,6 +2,7 @@
 
 import 'dart:math';
 import 'package:chat_app_study/domain/talk.dart';
+import 'package:chat_app_study/presentation/talk_page/picture_list_page.dart';
 import 'package:chat_app_study/presentation/talk_page/picture_page.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_model.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,17 @@ class TalkPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PictureListPage(
+                                size: size,
+                                roomID: roomID,
+                              ),
+                              fullscreenDialog: true,
+                            ));
+                      },
                       child: const Text('写真一覧'),
                     ),
                   ),

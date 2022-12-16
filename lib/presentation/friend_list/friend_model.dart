@@ -3,6 +3,7 @@
 import 'dart:math';
 
 import 'package:chat_app_study/domain/friend.dart';
+import 'package:chat_app_study/domain/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,10 @@ List<Friend> userList = [];
 
 class FriendModel extends ChangeNotifier {
   List<Friend> userList = [];
+  List<UserDB> allUserList = [];
+
   Map<String, dynamic> userInfo = {};
+  Map<String, dynamic> allUserInfo = {};
 
   final firestore = FirebaseFirestore.instance;
 
@@ -36,6 +40,16 @@ class FriendModel extends ChangeNotifier {
     doc.listen((snapshots) async {
       final userLists = snapshots.docs.map((doc) => Friend(doc)).toList();
       userList = userLists;
+      notifyListeners();
+    });
+  }
+
+  Future fetchAllUserList() async {
+    //firestoreからデータ取得
+    final doc = await firestore.collection('user').snapshots();
+    doc.listen((snapshots) async {
+      final userLists = snapshots.docs.map((doc) => UserDB(doc)).toList();
+      allUserList = userLists;
       notifyListeners();
     });
   }
@@ -82,6 +96,13 @@ class FriendModel extends ChangeNotifier {
     final doc = await firestore.collection('user').doc(uid).get();
     final userInfos = doc.data();
     userInfo = userInfos!;
+    notifyListeners();
+  }
+
+  Future getForAllUserInfo(String uid) async {
+    final doc = await firestore.collection('user').doc(uid).get();
+    final userInfos = doc.data();
+    allUserInfo = userInfos!;
     notifyListeners();
   }
 }
