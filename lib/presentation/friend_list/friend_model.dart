@@ -12,6 +12,8 @@ List<Friend> userList = [];
 
 class FriendModel extends ChangeNotifier {
   List<Friend> userList = [];
+  List<Friend2> userList2 = [];
+
   List<UserDB> allUserList = [];
 
   Map<String, dynamic> userInfo = {};

@@ -1,4 +1,5 @@
 import 'package:chat_app_study/presentation/my_profile/my_profile_model.dart';
+import 'package:chat_app_study/presentation/talk_page/picture_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,35 +37,62 @@ class MyProfilePage extends StatelessWidget {
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                          Row(
-                            children: [
-                              model.userInfo['photUrl'] != null
-                                  ? Container(
-                                      alignment: Alignment.center,
-                                      height: 100,
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              fit: BoxFit.fill,
-                                              image: NetworkImage(
-                                                  model.userInfo['photUrl']))))
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      height: 100,
-                                      width: 100,
-                                      decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              fit: BoxFit.fill,
-                                              image: AssetImage(
-                                                  'images/user.png')))),
-                              IconButton(
-                                  onPressed: () async {
-                                    await model.pickImage();
-                                  },
-                                  icon: const Icon(Icons.picture_as_pdf))
-                            ],
+                          IntrinsicHeight(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                model.userInfo['photUrl'] != null
+                                    ? Container(
+                                        alignment: Alignment.center,
+                                        height: 100,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: NetworkImage(model
+                                                    .userInfo['photUrl']))))
+                                    : Container(
+                                        alignment: Alignment.center,
+                                        height: 100,
+                                        width: 100,
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: AssetImage(
+                                                    'images/user.png')))),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                        onPressed: () async {
+                                          await model
+                                              .pickImage()
+                                              .then((value) => value != null
+                                                  ? Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            PicturePage(
+                                                          ontap: () async {
+                                                            await model
+                                                                .updataPhot(
+                                                                    uid);
+                                                          },
+                                                          imageFile:
+                                                              model.imageFile,
+                                                          size: size,
+                                                        ),
+                                                        fullscreenDialog: true,
+                                                      ))
+                                                  : print(value));
+                                        },
+                                        icon: const Icon(Icons.picture_as_pdf)),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

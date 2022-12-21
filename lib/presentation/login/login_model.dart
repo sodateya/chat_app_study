@@ -56,7 +56,7 @@ class LoginModel extends ChangeNotifier {
     final token = await FirebaseMessaging.instance.getToken();
     FirebaseFirestore.instance.collection('user').doc(user.uid).set({
       'uid': user.uid,
-      'photUrl': user.photoURL,
+      'photUrl': user.photoURL ?? '',
       'name': user.displayName ?? name,
       'RQpass': randomString(20),
       'uniquID': '',

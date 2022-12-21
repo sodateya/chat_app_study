@@ -27,6 +27,7 @@ dependencies:
   flutter_chat_ui: ^1.6.6
   bottom_sheet_bar: ^2.3.8
   image: ^3.2.2
+  cached_network_image: ^3.2.3
 
 
 dev_dependencies:

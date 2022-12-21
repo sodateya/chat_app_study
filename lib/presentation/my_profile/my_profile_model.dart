@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -11,7 +12,7 @@ class MyProfileModel extends ChangeNotifier {
   late String uniquID;
   late String name;
   late bool isUsed;
-  late File imageFile;
+  File? imageFile;
   final picker = ImagePicker();
 
   final firebase = FirebaseFirestore.instance;
@@ -57,11 +58,22 @@ class MyProfileModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      imageFile = File(pickedFile.path);
-      notifyListeners();
+  Future updataPhot(String uid) async {
+    final doc = FirebaseFirestore.instance.collection('user').doc(uid);
+    String? imgURL;
+    if (imageFile != null) {
+      final task = await FirebaseStorage.instance
+          .ref('talk/${doc.id}')
+          .putFile(imageFile!);
+      imgURL = await task.ref.getDownloadURL();
     }
+    await doc.update({'photUrl': imgURL});
+  }
+
+  Future pickImage() async {
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery, maxHeight: 400, maxWidth: 400);
+    imageFile = File(pickedFile!.path);
+    return imageFile;
   }
 }

@@ -23,6 +23,14 @@ class PictureListPage extends StatelessWidget {
         child: Consumer<TalkModel>(builder: (context, model, child) {
           return Scaffold(
             appBar: AppBar(
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                  Color(0xff8171D3),
+                  Color(0xff9DD3E4)
+                ] //グラデーションの設定
+                        )),
+              ),
               title: const Text('写真一覧'),
             ),
             body: GridView.builder(

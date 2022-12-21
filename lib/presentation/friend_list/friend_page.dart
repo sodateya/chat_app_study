@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_study/domain/friend.dart';
 import 'package:chat_app_study/domain/user.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_page.dart';
@@ -19,7 +20,7 @@ class FriendPage extends StatelessWidget {
 
     return ChangeNotifierProvider.value(
         value: FriendModel()
-          ..getUserList(uid)
+          ..fetchUserList(uid)
           ..fetchAllUserList(), //FriendMdelを使って..getCacheUserListでUserの情報をとる
         child: Consumer<FriendModel>(builder: (context, model, child) {
           void getMore() async {
@@ -83,14 +84,17 @@ class FriendPage extends StatelessWidget {
                             print('po');
                           },
                           child: SizedBox(
-                            height: size.height * 0.1,
+                            height: size.height * 0.12,
                             child: ListView.builder(
                               physics: const AlwaysScrollableScrollPhysics(),
                               controller: scrollController2,
                               itemCount: allUser.length,
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
-                                return IconTile(allUser[index], uid, size);
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconTile(allUser[index], uid, size),
+                                );
                               },
                             ),
                           ),
@@ -108,7 +112,26 @@ class FriendPage extends StatelessWidget {
                                 itemCount: friends.length,
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  return UserTile(friends[index], uid, size);
+                                  return index == 0
+                                      ? Container(
+                                          decoration: const BoxDecoration(
+                                              border: Border(
+                                                  top: BorderSide(
+                                                      color: Colors.grey,
+                                                      width: 0),
+                                                  bottom: BorderSide(
+                                                      color: Colors.grey,
+                                                      width: 0))),
+                                          child: UserTile(
+                                              friends[index], uid, size))
+                                      : Container(
+                                          decoration: const BoxDecoration(
+                                              border: Border(
+                                                  bottom: BorderSide(
+                                                      color: Colors.grey,
+                                                      width: 0))),
+                                          child: UserTile(
+                                              friends[index], uid, size));
                                 },
                               ),
                             ),
@@ -131,90 +154,95 @@ class UserTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
         value: FriendModel()..getUserInfo(friends.uid),
-        child: Consumer<FriendModel>(builder: (context, model, child) {
-          return model.userInfo.isEmpty
-              ? Container(
-                  alignment: Alignment.center,
-                  width: 50,
-                  height: 50,
-                  child: const CircularProgressIndicator(),
-                )
-              : ListTile(
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(model.userInfo['name']),
-                      Text(
-                        friends.applyState,
-                        style: TextStyle(color: () {
-                          switch (friends.applyState) {
-                            case '申請中':
-                              return Colors.green;
-                            case '承認':
-                              return Colors.blue;
-                            case '拒否':
-                              return Colors.red;
-                            default:
-                          }
-                        }()),
-                      ),
-                    ],
-                  ),
-                  leading: model.userInfo['photUrl'] != null
-                      ? Container(
-                          height: 55,
-                          width: 55,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image:
-                                      NetworkImage(model.userInfo['photUrl']))))
-                      : Container(
-                          height: 55,
-                          width: 55,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: AssetImage('images/user.png')))),
-                  onTap: () async {
-                    switch (friends.applyState) {
-                      case '申請中':
-                        showDialog(
-                            context: context,
-                            builder: ((context) {
-                              return const AlertDialog(
-                                title: Text('申請中です'),
-                              );
-                            }));
-                        break;
-                      case '承認':
-                        await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TalkPage(
-                                      roomID: friends.roomId,
-                                      uid: uid,
-                                      size: size,
-                                      userInfo: model.userInfo,
-                                    )));
-                        print('トーク画面へ');
-                        break;
-                      case '拒否':
-                        showDialog(
-                            context: context,
-                            builder: ((context) {
-                              return const AlertDialog(
-                                title: Text('申請を拒否 されました'),
-                              );
-                            }));
-                        break;
-                      default:
-                    }
-                  },
-                );
-        }));
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Consumer<FriendModel>(builder: (context, model, child) {
+            return model.userInfo.isEmpty
+                ? Container(
+                    alignment: Alignment.center,
+                    width: 50,
+                    height: 50,
+                    child: const CircularProgressIndicator(),
+                  )
+                : ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(model.userInfo['name']),
+                        Text(
+                          friends.applyState,
+                          style: TextStyle(color: () {
+                            switch (friends.applyState) {
+                              case '申請中':
+                                return Colors.green;
+                              case '承認':
+                                return Colors.blue;
+                              case '拒否':
+                                return Colors.red;
+                              default:
+                            }
+                          }()),
+                        ),
+                      ],
+                    ),
+                    leading: model.userInfo['photUrl'] != ''
+                        ? Container(
+                            height: 55,
+                            width: 55,
+                            decoration:
+                                const BoxDecoration(shape: BoxShape.circle),
+                            clipBehavior: Clip.antiAlias,
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: model.userInfo['photUrl'],
+                            ),
+                          )
+                        : Container(
+                            height: 55,
+                            width: 55,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    fit: BoxFit.fill,
+                                    image: AssetImage('images/user.png')))),
+                    onTap: () async {
+                      switch (friends.applyState) {
+                        case '申請中':
+                          showDialog(
+                              context: context,
+                              builder: ((context) {
+                                return const AlertDialog(
+                                  title: Text('申請中です'),
+                                );
+                              }));
+                          break;
+                        case '承認':
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TalkPage(
+                                        roomID: friends.roomId,
+                                        uid: uid,
+                                        size: size,
+                                        userInfo: model.userInfo,
+                                      )));
+                          print('トーク画面へ');
+                          break;
+                        case '拒否':
+                          showDialog(
+                              context: context,
+                              builder: ((context) {
+                                return const AlertDialog(
+                                  title: Text('申請を拒否 されました'),
+                                );
+                              }));
+                          break;
+                        default:
+                      }
+                    },
+                  );
+          }),
+        ));
   }
 }
 
@@ -227,24 +255,23 @@ class IconTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
         value: FriendModel()..getForAllUserInfo(allUser.uid),
-        child: Consumer<FriendModel>(builder: (context, model, child) {
-          return model.allUserInfo.isEmpty
-              ? Container(
-                  alignment: Alignment.center,
-                  width: 50,
-                  height: 50,
-                  child: const CircularProgressIndicator(),
-                )
-              : model.allUserInfo['photUrl'] != null
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                print(allUser.name);
+              },
+              child: allUser.photUrl != ''
                   ? Container(
                       height: 55,
                       width: 55,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image:
-                                  NetworkImage(model.allUserInfo['photUrl']))))
+                      decoration: BoxDecoration(shape: BoxShape.circle),
+                      clipBehavior: Clip.antiAlias,
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: allUser.photUrl,
+                      ),
+                    )
                   : Container(
                       height: 55,
                       width: 55,
@@ -252,7 +279,18 @@ class IconTile extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                               fit: BoxFit.fill,
-                              image: AssetImage('images/user.png'))));
-        }));
+                              image: AssetImage('images/user.png')))),
+            ),
+            SizedBox(
+              width: 55,
+              child: Center(
+                child: Text(
+                  allUser.name,
+                  maxLines: 1,
+                ),
+              ),
+            )
+          ],
+        ));
   }
 }

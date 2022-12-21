@@ -1,6 +1,8 @@
 // ignore_for_file: must_be_immutable, missing_return, use_build_context_synchronously
 
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app_study/domain/custom_cache_manager.dart';
 import 'package:chat_app_study/domain/talk.dart';
 import 'package:chat_app_study/presentation/talk_page/picture_list_page.dart';
 import 'package:chat_app_study/presentation/talk_page/picture_page.dart';
@@ -142,10 +144,12 @@ class TalkPage extends StatelessWidget {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       PicturePage(
+                                                    ontap: () async {
+                                                      await model.addImage(
+                                                          roomID, uid);
+                                                    },
                                                     imageFile: model.imageFile,
                                                     size: size,
-                                                    roomID: roomID,
-                                                    uid: uid,
                                                   ),
                                                   fullscreenDialog: true,
                                                 ))
@@ -294,34 +298,19 @@ Widget otherTalk(Size size, Talk talk, String roomID, String uid) {
                             onTap: () async {
                               await launch(talk.imgURL);
                             },
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                  maxWidth: 150.0, maxHeight: 200.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  talk.imgURL,
-                                  fit: BoxFit.fill,
-                                  loadingBuilder: (
-                                    BuildContext context,
-                                    Widget child,
-                                    ImageChunkEvent?
-                                        loadingProgress, // ImageChunkEventに「?」が必要です。
-                                  ) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes! //expectedTotalBytesはint?型なので「!」が必要です。
-                                            : null,
-                                      ),
-                                    );
-                                  },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                    maxWidth: 150.0, maxHeight: 200.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: talk.imgURL,
+                                  cacheManager: customCacheManager,
+                                  progressIndicatorBuilder:
+                                      (context, url, downloadProgress) =>
+                                          CircularProgressIndicator(
+                                    value: downloadProgress.progress,
+                                  ),
                                 ),
                               ),
                             )),
@@ -383,64 +372,48 @@ Widget myTalk(Size size, Talk talk) {
                   width: 8,
                 ),
                 Flexible(
-                  child: talk.message != ''
-                      ? Container(
-                          padding: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [
-                              Color(0xffB08BD3),
-                              Color(0xff6A75BD)
-                            ] //グラデーションの設定
-                                ),
-                            borderRadius: BorderRadius.circular(10),
-                            color: const Color(0xff2d3441),
-                          ),
-                          child: Text(
-                            talk.message,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                              color: Color(0xffFCFAF2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
+                    child: talk.message != ''
+                        ? Container(
+                            padding: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(colors: [
+                                Color(0xffB08BD3),
+                                Color(0xff6A75BD)
+                              ] //グラデーションの設定
+                                  ),
+                              borderRadius: BorderRadius.circular(10),
+                              color: const Color(0xff2d3441),
                             ),
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () async {
-                            await launch(talk.imgURL);
-                          },
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                                maxWidth: 150.0, maxHeight: 200.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                talk.imgURL,
-                                fit: BoxFit.fill,
-                                loadingBuilder: (
-                                  BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent?
-                                      loadingProgress, // ImageChunkEventに「?」が必要です。
-                                ) {
-                                  if (loadingProgress == null) return child;
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value: loadingProgress
-                                                  .expectedTotalBytes !=
-                                              null
-                                          ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes! //expectedTotalBytesはint?型なので「!」が必要です。
-                                          : null,
-                                    ),
-                                  );
-                                },
+                            child: Text(
+                              talk.message,
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                color: Color(0xffFCFAF2),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.0,
                               ),
                             ),
-                          )),
-                ),
+                          )
+                        : GestureDetector(
+                            onTap: () async {
+                              await launch(talk.imgURL);
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                    maxWidth: 150.0, maxHeight: 200.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: talk.imgURL,
+                                  cacheManager: customCacheManager,
+                                  progressIndicatorBuilder:
+                                      (context, url, downloadProgress) =>
+                                          CircularProgressIndicator(
+                                    value: downloadProgress.progress,
+                                  ),
+                                ),
+                              ),
+                            ))),
               ],
             ),
           ),

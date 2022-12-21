@@ -1,30 +1,28 @@
 // ignore_for_file: must_be_immutable, missing_return, use_build_context_synchronously
 
 import 'dart:io';
-import 'dart:math';
-import 'package:chat_app_study/domain/talk.dart';
-import 'package:chat_app_study/presentation/login/login.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 //File imageFile;
 
 class PicturePage extends StatelessWidget {
-  PicturePage(
-      {super.key,
-      required this.imageFile,
-      required this.size,
-      required this.roomID,
-      required this.uid});
+  PicturePage({
+    super.key,
+    required this.ontap,
+    required this.imageFile,
+    required this.size,
+  });
 
+  final AsyncCallback ontap;
   late File? imageFile;
   late Size size;
-  late String roomID;
-  late String uid;
 
   @override
   Widget build(BuildContext context) {
+    print(ontap);
     return ChangeNotifierProvider.value(
         value: TalkModel(),
         child: Consumer<TalkModel>(builder: (context, model, child) {
@@ -54,7 +52,6 @@ class PicturePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.file(
                         imageFile!,
-                        fit: BoxFit.fill,
                       ),
                     ),
                   ),
@@ -68,7 +65,7 @@ class PicturePage extends StatelessWidget {
                           child: const CircularProgressIndicator(),
                         ),
                       )
-                    : SizedBox.square(),
+                    : const SizedBox.square(),
               ],
             ),
             floatingActionButton: model.isSending == false
@@ -77,7 +74,8 @@ class PicturePage extends StatelessWidget {
                     onPressed: () async {
                       try {
                         model.startSend();
-                        await model.addImage(roomID, uid);
+                        await ontap();
+                        // await model.addImage(roomID, uid);
                       } catch (e) {
                         print(e);
                       } finally {
@@ -87,7 +85,7 @@ class PicturePage extends StatelessWidget {
                       Navigator.of(context).pop();
                     },
                   )
-                : SizedBox.square(),
+                : const SizedBox.square(),
           );
         }));
   }

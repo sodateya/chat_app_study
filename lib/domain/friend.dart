@@ -10,3 +10,9 @@ class Friend {
   late String roomId;
   late String applyState;
 }
+
+class Friend2 {
+  late String uid;
+  late String roomId;
+  late String applyState;
+}

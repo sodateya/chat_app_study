@@ -3,6 +3,7 @@ import 'package:chat_app_study/domain/talk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as Im;
 import 'package:path_provider/path_provider.dart';
@@ -99,6 +100,7 @@ class TalkModel extends ChangeNotifier {
   }
 
   Future addImage(String roomID, String uid) async {
+    print('スタート');
     final doc = FirebaseFirestore.instance
         .collection('rooms')
         .doc(roomID)
@@ -119,6 +121,7 @@ class TalkModel extends ChangeNotifier {
       'imgURL': imgURL,
       'read': [uid]
     });
+    print('フィニッシュ');
   }
 
   Future pickImage() async {
