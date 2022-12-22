@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -75,5 +76,13 @@ class MyProfileModel extends ChangeNotifier {
         source: ImageSource.gallery, maxHeight: 400, maxWidth: 400);
     imageFile = File(pickedFile!.path);
     return imageFile;
+  }
+
+  Future updateToken(String uid) async {
+    final messaging = FirebaseMessaging.instance;
+    final token = await messaging.getToken();
+    final doc = FirebaseFirestore.instance.collection('user').doc(uid);
+    await doc.update({'pushToken': token});
+    print('🐯 FCM TOKEN: $token');
   }
 }

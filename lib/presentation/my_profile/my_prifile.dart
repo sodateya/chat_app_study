@@ -118,6 +118,11 @@ class MyProfilePage extends StatelessWidget {
                                   icon: Icon(Icons.edit))
                             ],
                           ),
+                          ElevatedButton(
+                              onPressed: () async {
+                                await model.updateToken(uid);
+                              },
+                              child: Text('トークンアップデート'))
                         ]),
             ));
       }),

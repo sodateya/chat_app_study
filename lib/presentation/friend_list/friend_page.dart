@@ -160,8 +160,8 @@ class UserTile extends StatelessWidget {
             return model.userInfo.isEmpty
                 ? Container(
                     alignment: Alignment.center,
-                    width: 50,
-                    height: 50,
+                    width: 25,
+                    height: 25,
                     child: const CircularProgressIndicator(),
                   )
                 : ListTile(
@@ -221,7 +221,7 @@ class UserTile extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => TalkPage(
-                                        roomID: friends.roomId,
+                                        roomID: friends.roomID,
                                         uid: uid,
                                         size: size,
                                         userInfo: model.userInfo,
@@ -265,7 +265,7 @@ class IconTile extends StatelessWidget {
                   ? Container(
                       height: 55,
                       width: 55,
-                      decoration: BoxDecoration(shape: BoxShape.circle),
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
                       clipBehavior: Clip.antiAlias,
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,

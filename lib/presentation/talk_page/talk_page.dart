@@ -306,11 +306,6 @@ Widget otherTalk(Size size, Talk talk, String roomID, String uid) {
                                 child: CachedNetworkImage(
                                   imageUrl: talk.imgURL,
                                   cacheManager: customCacheManager,
-                                  progressIndicatorBuilder:
-                                      (context, url, downloadProgress) =>
-                                          CircularProgressIndicator(
-                                    value: downloadProgress.progress,
-                                  ),
                                 ),
                               ),
                             )),
@@ -406,11 +401,6 @@ Widget myTalk(Size size, Talk talk) {
                                 child: CachedNetworkImage(
                                   imageUrl: talk.imgURL,
                                   cacheManager: customCacheManager,
-                                  progressIndicatorBuilder:
-                                      (context, url, downloadProgress) =>
-                                          CircularProgressIndicator(
-                                    value: downloadProgress.progress,
-                                  ),
                                 ),
                               ),
                             ))),

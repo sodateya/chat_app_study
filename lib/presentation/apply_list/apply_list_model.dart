@@ -37,7 +37,7 @@ class ApplyListModel extends ChangeNotifier {
         .doc(myID)
         .collection('friendList')
         .doc(friend.uid)
-        .set({'uid': friend.uid, 'roomID': friend.roomId, 'applyState': '承認'});
+        .set({'uid': friend.uid, 'roomID': friend.roomID, 'applyState': '承認'});
 
     await FirebaseFirestore.instance
         .collection('user')

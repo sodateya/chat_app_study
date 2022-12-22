@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_study/domain/talk.dart';
 import 'package:chat_app_study/presentation/login/login.dart';
 import 'package:chat_app_study/presentation/talk_page/talk_model.dart';
@@ -40,11 +41,9 @@ class PictureListPage extends StatelessWidget {
               itemCount: model.images.length, //要素数
               itemBuilder: (context, index) {
                 //要素を戻り値で返す
-                return Container(
-                  child: Image.network(
-                    model.images[index].imgURL,
-                    fit: BoxFit.contain,
-                  ),
+                return CachedNetworkImage(
+                  imageUrl: model.images[index].imgURL,
+                  fit: BoxFit.contain,
                 );
               },
               shrinkWrap: true,
