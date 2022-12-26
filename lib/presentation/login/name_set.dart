@@ -17,7 +17,7 @@ class NameSetPage extends StatelessWidget {
       child: Consumer<LoginModel>(builder: (context, model, child) {
         return Scaffold(
             appBar: AppBar(
-              title: Text('名前を設定'),
+              title: const Text('名前を設定'),
             ),
             body:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -27,7 +27,7 @@ class NameSetPage extends StatelessWidget {
                     model.name = controller.text;
                     await setDb(model, context, user!);
                   },
-                  child: Text('登録'))
+                  child: const Text('登録'))
             ]));
       }),
     );

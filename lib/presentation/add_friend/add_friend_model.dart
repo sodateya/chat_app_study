@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class AddFriendModel extends ChangeNotifier {
   String uniquID = '';
   late Map<String, dynamic> firendData;
-  late bool isUsed;
+  late bool isAlreadyId;
   late bool isMyFriend;
 
   Map<String, dynamic> userInfo = {};
@@ -13,8 +13,8 @@ class AddFriendModel extends ChangeNotifier {
     if (id == '') {
       throw ('IDを入力してください');
     }
-    await chackCanUseId(id);
-    if (isUsed == false) {
+    await chackAlreadyFriendId(id);
+    if (isAlreadyId == false) {
       throw ('該当するユーザーはいません');
     }
     final doc = await FirebaseFirestore.instance
@@ -23,6 +23,18 @@ class AddFriendModel extends ChangeNotifier {
         .get();
     firendData = await doc.docs.first.data();
     await chackIsMyFriend(firendData['uid'], uid);
+    if (isMyFriend == true) {
+      throw ('既に友達のユーザーです');
+    }
+    notifyListeners();
+  }
+
+  Future getFriendDadaForQR(Map<String, dynamic> result, String uid) async {
+    await chackAlreadyFriendQR(result['RQpass']);
+    if (isAlreadyId == false) {
+      throw ('該当するユーザーはいません');
+    }
+    await chackIsMyFriend(result['uid'], uid);
     if (isMyFriend == true) {
       throw ('既に友達のユーザーです');
     }
@@ -45,16 +57,30 @@ class AddFriendModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future chackCanUseId(String id) async {
+  Future chackAlreadyFriendQR(String id) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('user')
+        .where('RQpass', isEqualTo: id)
+        .get();
+    final length = doc.docs.length;
+    if (length == 0) {
+      isAlreadyId = false;
+    } else {
+      isAlreadyId = true;
+    }
+    notifyListeners();
+  }
+
+  Future chackAlreadyFriendId(String id) async {
     final doc = await FirebaseFirestore.instance
         .collection('user')
         .where('uniquID', isEqualTo: id)
         .get();
     final length = doc.docs.length;
     if (length == 0) {
-      isUsed = false;
+      isAlreadyId = false;
     } else {
-      isUsed = true;
+      isAlreadyId = true;
     }
     notifyListeners();
   }

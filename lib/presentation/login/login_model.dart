@@ -15,21 +15,40 @@ class LoginModel extends ChangeNotifier {
   late User user;
   late String name;
   bool agreeToTerms = false;
+  late bool isUsedQR;
+  String randomStr = "";
 
   void isAgreeToTerms(bool? value) {
     agreeToTerms = value ?? false;
     notifyListeners();
   }
 
-  String randomString(int length) {
-    String randomStr = "";
+  Future chackCanUseQRpass(String id) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('user')
+        .where('RQpass', isEqualTo: id)
+        .get();
+    final length = doc.docs.length;
+    if (length == 0) {
+      isUsedQR = false;
+      print(isUsedQR);
+    } else {
+      isUsedQR = true;
+      print(isUsedQR);
+    }
+    print(randomStr);
+    notifyListeners();
+  }
+
+  Future randomString(int length) async {
+    randomStr = "";
     var random = math.Random();
     for (var i = 0; i < length; i++) {
       int alphaNum = 65 + random.nextInt(26);
       int isLower = random.nextBool() ? 32 : 0;
       randomStr += String.fromCharCode(alphaNum + isLower);
     }
-    return randomStr;
+    return await randomStr;
   }
 
   Future readAgree() async {
@@ -58,7 +77,7 @@ class LoginModel extends ChangeNotifier {
       'uid': user.uid,
       'photUrl': user.photoURL ?? '',
       'name': user.displayName ?? name,
-      'RQpass': randomString(20),
+      'RQpass': randomStr,
       'uniquID': '',
       'pushToken': token
     });
@@ -70,7 +89,7 @@ class LoginModel extends ChangeNotifier {
       'uid': user.uid,
       'photUrl': user.photoURL,
       'name': user.displayName,
-      'RQpass': randomString(20),
+      'RQpass': randomStr,
       'uniquID': '',
       'pushToken': token
     });

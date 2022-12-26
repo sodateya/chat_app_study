@@ -1,7 +1,7 @@
 // ignore_for_file: await_only_futures
 
 import 'dart:io';
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,6 +13,8 @@ class MyProfileModel extends ChangeNotifier {
   late String uniquID;
   late String name;
   late bool isUsed;
+  late bool isUsedQR;
+
   File? imageFile;
   final picker = ImagePicker();
 
@@ -53,8 +55,10 @@ class MyProfileModel extends ChangeNotifier {
     final length = doc.docs.length;
     if (length == 0) {
       isUsed = false;
+      print(isUsed);
     } else {
       isUsed = true;
+      print(isUsed);
     }
     notifyListeners();
   }
@@ -83,6 +87,49 @@ class MyProfileModel extends ChangeNotifier {
     final token = await messaging.getToken();
     final doc = FirebaseFirestore.instance.collection('user').doc(uid);
     await doc.update({'pushToken': token});
-    print('🐯 FCM TOKEN: $token');
+    print(token);
+  }
+
+  Future chackCanUseQRpass(String id) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('user')
+        .where('RQpass', isEqualTo: id)
+        .get();
+    final length = doc.docs.length;
+    if (length == 0) {
+      isUsedQR = false;
+      print(isUsedQR);
+    } else {
+      isUsedQR = true;
+      print(isUsedQR);
+    }
+    print(randomStr);
+    notifyListeners();
+  }
+
+  String randomStr = "";
+
+  Future randomString(int length) async {
+    randomStr = "";
+    var random = math.Random();
+    for (var i = 0; i < length; i++) {
+      int alphaNum = 65 + random.nextInt(26);
+      int isLower = random.nextBool() ? 32 : 0;
+      randomStr += String.fromCharCode(alphaNum + isLower);
+    }
+    return await randomStr;
+  }
+
+  Future updateQRpass(String uid) async {
+    await randomString(20);
+    await chackCanUseQRpass(randomStr);
+    if (isUsedQR == true) {
+      print('重複');
+      await randomString(20);
+      print(randomStr);
+    }
+    final doc = FirebaseFirestore.instance.collection('user').doc(uid);
+    await doc.update({'RQpass': randomStr});
+    print(randomStr);
   }
 }
