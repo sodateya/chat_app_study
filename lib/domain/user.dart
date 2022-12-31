@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserDB {
   UserDB(DocumentSnapshot doc) {
-    qQpass = doc['RQpass'];
+    qQpass = doc['QRpass'];
     name = doc['name'];
     photUrl = doc['photUrl'];
     pushToken = doc['pushToken'];

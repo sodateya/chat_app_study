@@ -93,7 +93,7 @@ class MyProfileModel extends ChangeNotifier {
   Future chackCanUseQRpass(String id) async {
     final doc = await FirebaseFirestore.instance
         .collection('user')
-        .where('RQpass', isEqualTo: id)
+        .where('QRpass', isEqualTo: id)
         .get();
     final length = doc.docs.length;
     if (length == 0) {
@@ -129,7 +129,7 @@ class MyProfileModel extends ChangeNotifier {
       print(randomStr);
     }
     final doc = FirebaseFirestore.instance.collection('user').doc(uid);
-    await doc.update({'RQpass': randomStr});
+    await doc.update({'QRpass': randomStr});
     print(randomStr);
   }
 }

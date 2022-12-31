@@ -26,7 +26,7 @@ class LoginModel extends ChangeNotifier {
   Future chackCanUseQRpass(String id) async {
     final doc = await FirebaseFirestore.instance
         .collection('user')
-        .where('RQpass', isEqualTo: id)
+        .where('QRpass', isEqualTo: id)
         .get();
     final length = doc.docs.length;
     if (length == 0) {
@@ -77,7 +77,7 @@ class LoginModel extends ChangeNotifier {
       'uid': user.uid,
       'photUrl': user.photoURL ?? '',
       'name': user.displayName ?? name,
-      'RQpass': randomStr,
+      'QRpass': randomStr,
       'uniquID': '',
       'pushToken': token
     });
@@ -89,7 +89,7 @@ class LoginModel extends ChangeNotifier {
       'uid': user.uid,
       'photUrl': user.photoURL,
       'name': user.displayName,
-      'RQpass': randomStr,
+      'QRpass': randomStr,
       'uniquID': '',
       'pushToken': token
     });

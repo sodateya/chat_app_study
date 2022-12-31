@@ -19,11 +19,8 @@ class MyProfilePage extends StatelessWidget {
               title: const Text('プロフィール編集'),
               flexibleSpace: Container(
                 decoration: const BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                  Color(0xff8171D3),
-                  Color(0xff9DD3E4)
-                ] //グラデーションの設定
-                        )),
+                    gradient: LinearGradient(
+                        colors: [Color(0xff8171D3), Color(0xff9DD3E4)])),
               ),
             ),
             body: SizedBox(
@@ -127,7 +124,7 @@ class MyProfilePage extends StatelessWidget {
                               },
                               child: Text('トークンアップデート')),
                           QrImage(
-                            data: '${model.userInfo['RQpass']}',
+                            data: '${model.userInfo['QRpass']}',
                             version: QrVersions.auto,
                             size: 200.0,
                           ),

@@ -48,7 +48,8 @@ class ApplyListPage extends StatelessWidget {
                       await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AddFriendPage(uid: uid)));
+                              builder: (context) =>
+                                  AddFriendListPage(uid: uid, size: size)));
                     },
                     icon: const Icon(Icons.person_add_alt_1))
               ],

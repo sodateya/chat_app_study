@@ -82,7 +82,7 @@ class _QRScanPageState extends State<QRScanPage> {
     try {
       final doc = await FirebaseFirestore.instance
           .collection('user')
-          .where('RQpass', isEqualTo: data)
+          .where('QRpass', isEqualTo: data)
           .get();
       final length = doc.docs.length;
       if (length == 0) {

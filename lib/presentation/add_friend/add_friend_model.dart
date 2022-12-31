@@ -1,13 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../domain/friend.dart';
+
 class AddFriendModel extends ChangeNotifier {
   String uniquID = '';
-  late Map<String, dynamic> firendData;
+  Map<String, dynamic>? firendData;
   late bool isAlreadyId;
   late bool isMyFriend;
+  String? erroeMsg;
+  bool isInControllerText = false;
 
-  Map<String, dynamic> userInfo = {};
+  void resetUserData() async {
+    firendData = await null;
+    notifyListeners();
+  }
+
+  void resetError() {
+    erroeMsg = null;
+    notifyListeners();
+  }
+
+  void catchError(String e) {
+    erroeMsg = e;
+    notifyListeners();
+  }
+
+  void inText() {
+    isInControllerText = true;
+    notifyListeners();
+  }
+
+  void notInText() {
+    isInControllerText = false;
+    notifyListeners();
+  }
 
   Future getFriendDada(String id, String uid) async {
     if (id == '') {
@@ -22,7 +49,7 @@ class AddFriendModel extends ChangeNotifier {
         .where('uniquID', isEqualTo: id)
         .get();
     firendData = await doc.docs.first.data();
-    await chackIsMyFriend(firendData['uid'], uid);
+    await chackIsMyFriend(firendData!['uid'], uid);
     if (isMyFriend == true) {
       throw ('既に友達のユーザーです');
     }
@@ -30,7 +57,7 @@ class AddFriendModel extends ChangeNotifier {
   }
 
   Future getFriendDadaForQR(Map<String, dynamic> result, String uid) async {
-    await chackAlreadyFriendQR(result['RQpass']);
+    await chackAlreadyFriendQR(result['QRpass']);
     if (isAlreadyId == false) {
       throw ('該当するユーザーはいません');
     }
@@ -60,7 +87,7 @@ class AddFriendModel extends ChangeNotifier {
   Future chackAlreadyFriendQR(String id) async {
     final doc = await FirebaseFirestore.instance
         .collection('user')
-        .where('RQpass', isEqualTo: id)
+        .where('QRpass', isEqualTo: id)
         .get();
     final length = doc.docs.length;
     if (length == 0) {
@@ -105,5 +132,73 @@ class AddFriendModel extends ChangeNotifier {
         .collection('friendApply')
         .doc(uid)
         .set({'uid': uid, 'roomID': room.id, 'applyState': '申請中'});
+  }
+
+  List<Friend> userList = [];
+  Map<String, dynamic> userInfo = {};
+
+  final firestore = FirebaseFirestore.instance;
+
+  Future fetchApplyList(String uid) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(uid)
+        .collection('friendApply')
+        .where('applyState', isEqualTo: '申請中')
+        .snapshots();
+    doc.listen((snapshots) async {
+      final userLists = snapshots.docs.map((doc) => Friend(doc)).toList();
+      userList = userLists;
+      notifyListeners();
+    });
+  }
+
+  Future approve(Friend friend, String myID) async {
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(myID)
+        .collection('friendApply')
+        .doc(friend.uid)
+        .update({'approve': true, 'applyState': '承認'});
+
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(myID)
+        .collection('friendList')
+        .doc(friend.uid)
+        .set({'uid': friend.uid, 'roomID': friend.roomID, 'applyState': '承認'});
+
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(friend.uid)
+        .collection('friendList')
+        .doc(myID)
+        .update({'applyState': '承認'});
+    notifyListeners();
+  }
+
+  Future notApprove(Friend friend, String myID) async {
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(myID)
+        .collection('friendApply')
+        .doc(friend.uid)
+        .update({'approve': false, 'applyState': '拒否'});
+
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(friend.uid)
+        .collection('friendList')
+        .doc(myID)
+        .update({'applyState': '拒否'});
+
+    notifyListeners();
+  }
+
+  Future getUserInfo(String uid) async {
+    final doc = await firestore.collection('user').doc(uid).get();
+    final userInfos = doc.data();
+    userInfo = userInfos!;
+    notifyListeners();
   }
 }

@@ -9,8 +9,8 @@ import '../my_profile/my_prifile.dart';
 import 'friend_model.dart';
 
 // ignore: must_be_immutable
-class FriendPage extends StatelessWidget {
-  FriendPage({super.key, required this.uid});
+class FriendListPage extends StatelessWidget {
+  FriendListPage({super.key, required this.uid});
   String uid;
 
   @override
@@ -20,15 +20,14 @@ class FriendPage extends StatelessWidget {
 
     return ChangeNotifierProvider.value(
         value: FriendModel()
-          ..fetchUserList(uid)
-          ..fetchAllUserList(), //FriendMdelを使って..getCacheUserListでUserの情報をとる
+          ..getUserList(uid)
+          ..getAllUserList(), //FriendMdelを使って..getCacheUserListでUserの情報をとる
         child: Consumer<FriendModel>(builder: (context, model, child) {
           void getMore() async {
             print('getMore');
           }
 
           final size = MediaQuery.of(context).size;
-
           final friends = model.userList;
           final allUser = model.allUserList;
           return Scaffold(
@@ -53,10 +52,15 @@ class FriendPage extends StatelessWidget {
               actions: [
                 IconButton(
                     onPressed: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddFriendPage(uid: uid)));
+                      showBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(25.0)),
+                          ),
+                          builder: ((context) {
+                            return AddFriendListPage(uid: uid, size: size);
+                          }));
                     },
                     icon: const Icon(Icons.person_add_alt_1))
               ],
@@ -70,7 +74,7 @@ class FriendPage extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          model.getCacheUserList(uid);
+                          model.getUserList(uid);
                         },
                         child: const Text('再読み込み'),
                       )
@@ -83,8 +87,11 @@ class FriendPage extends StatelessWidget {
                           onRefresh: () async {
                             print('po');
                           },
-                          child: SizedBox(
-                            height: size.height * 0.12,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(color: Colors.grey))),
+                            height: size.height * 0.1,
                             child: ListView.builder(
                               physics: const AlwaysScrollableScrollPhysics(),
                               controller: scrollController2,
@@ -92,7 +99,8 @@ class FriendPage extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
                                 return Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.only(
+                                      top: 8, left: 8, right: 8),
                                   child: IconTile(allUser[index], uid, size),
                                 );
                               },
@@ -104,36 +112,16 @@ class FriendPage extends StatelessWidget {
                             onRefresh: () async {
                               await model.fetchUserList(uid);
                             },
-                            child: SizedBox(
-                              height: size.height * 0.654,
-                              width: size.width * 0.97,
-                              child: ListView.builder(
-                                controller: scrollController,
-                                itemCount: friends.length,
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  return index == 0
-                                      ? Container(
-                                          decoration: const BoxDecoration(
-                                              border: Border(
-                                                  top: BorderSide(
-                                                      color: Colors.grey,
-                                                      width: 0),
-                                                  bottom: BorderSide(
-                                                      color: Colors.grey,
-                                                      width: 0))),
-                                          child: UserTile(
-                                              friends[index], uid, size))
-                                      : Container(
-                                          decoration: const BoxDecoration(
-                                              border: Border(
-                                                  bottom: BorderSide(
-                                                      color: Colors.grey,
-                                                      width: 0))),
-                                          child: UserTile(
-                                              friends[index], uid, size));
-                                },
-                              ),
+                            child: ListView.builder(
+                              controller: scrollController,
+                              itemCount: friends.length,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: (UserTile(friends[index], uid, size)),
+                                );
+                              },
                             ),
                           ),
                         ),

@@ -9,8 +9,8 @@ import '../talk_page/talk_page.dart';
 
 class HomeModel extends ChangeNotifier {
   final screens = [
-    FriendPage(uid: FirebaseAuth.instance.currentUser!.uid),
-    FriendPage(uid: FirebaseAuth.instance.currentUser!.uid),
+    FriendListPage(uid: FirebaseAuth.instance.currentUser!.uid),
+    FriendListPage(uid: FirebaseAuth.instance.currentUser!.uid),
     SettingPage(auth: FirebaseAuth.instance),
     ApplyListPage(uid: FirebaseAuth.instance.currentUser!.uid),
   ];

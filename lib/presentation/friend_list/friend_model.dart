@@ -55,6 +55,14 @@ class FriendModel extends ChangeNotifier {
     });
   }
 
+  Future getAllUserList() async {
+    //firestoreからデータ取得
+    final doc = await firestore.collection('user').get();
+    final userLists = doc.docs.map((doc) => UserDB(doc)).toList();
+    allUserList = userLists;
+    notifyListeners();
+  }
+
   Future getCacheUserList(String uid) async {
     //uid=自分のUID  キャッシュからデータを取得（26行目）
     var cache = FirebaseFirestore.instance
