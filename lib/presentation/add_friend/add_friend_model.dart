@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:qr_code_tools/qr_code_tools.dart';
 import '../../domain/friend.dart';
 
 class AddFriendModel extends ChangeNotifier {
@@ -10,6 +11,24 @@ class AddFriendModel extends ChangeNotifier {
   late bool isMyFriend;
   String? erroeMsg;
   bool isInControllerText = false;
+  String data = '';
+  final picker = ImagePicker();
+
+  Future pickImage() async {
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery, maxHeight: 400, maxWidth: 400);
+    data = pickedFile!.path;
+  }
+
+  Future decode() async {
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery, maxHeight: 400, maxWidth: 400);
+    final file = pickedFile!.path;
+    String data = await QrCodeToolsPlugin.decodeFrom(file);
+    this.data = data;
+    print(this.data);
+    notifyListeners();
+  }
 
   void resetUserData() async {
     firendData = await null;

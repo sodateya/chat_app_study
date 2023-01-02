@@ -1,12 +1,17 @@
 import 'dart:io';
 
+import 'package:chat_app_study/presentation/add_friend/add_friend_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import 'my_qr_page.dart';
+
 class QRScanPage extends StatefulWidget {
-  const QRScanPage({Key? key}) : super(key: key);
+  Size? size;
+  String? uid;
+  QRScanPage({Key? key, this.size, this.uid}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _QRScanPageState();
@@ -28,22 +33,107 @@ class _QRScanPageState extends State<QRScanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [Color(0xff8171D3), Color(0xff9DD3E4)] //グラデーションの設定
-                  )),
-        ),
-        title: const Text('QRコードをスキャンしてください'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(flex: 4, child: _buildQrView(context)),
-        ],
-      ),
-    );
+    return ChangeNotifierProvider.value(
+        value: AddFriendModel(),
+        child: Consumer<AddFriendModel>(builder: (context, model, child) {
+          return Scaffold(
+            body: Stack(
+              children: [
+                Column(
+                  children: <Widget>[
+                    Expanded(flex: 4, child: _buildQrView(context)),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 60, left: 20),
+                  child: IconButton(
+                      iconSize: 30,
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(Icons.close)),
+                ),
+                Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: Row(
+                        children: [
+                          Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: widget.size!.width,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.black26,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(90),
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            showMyQRCode();
+                                          },
+                                          child: SizedBox(
+                                            width: 120,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: const [
+                                                Icon(Icons.qr_code),
+                                                Text('マイQRコード')
+                                              ],
+                                            ),
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () async {
+                                  await model.decode();
+                                  await check(model.data);
+                                },
+                                icon: const Icon(
+                                    Icons.photo_size_select_actual_rounded),
+                                iconSize: 30,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+            bottomNavigationBar: const BottomAppBar(
+              height: 200,
+              child: Center(
+                child: Text('QRコードをスキャンして友達追加などの機能を利用できます'),
+              ),
+            ),
+          );
+        }));
   }
 
   // QRコードを読み取る枠の部分
@@ -107,6 +197,19 @@ class _QRScanPageState extends State<QRScanPage> {
             );
           }));
     }
+  }
+
+  Future showMyQRCode() async {
+    setState(() {
+      showModalBottomSheet(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          context: context,
+          builder: ((context) {
+            return MyQRcodePage(uid: widget.uid!);
+          }));
+    });
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {

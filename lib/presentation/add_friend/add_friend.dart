@@ -139,6 +139,7 @@ Future addFriendUseQR(Map<String, dynamic> data, AddFriendModel model,
           );
         }));
   } catch (e) {
+    print(e);
     final snackBar = SnackBar(
       backgroundColor: const Color(0xffD0104C),
       content: Text(e.toString()),
@@ -189,8 +190,8 @@ class SearchButtoms extends StatelessWidget {
                           )
                         ],
                       ),
-                      onTap: () {
-                        print('pon');
+                      onTap: () async {
+                        await model.decode();
                       }))),
           Flexible(
               child: Container(
@@ -215,8 +216,11 @@ class SearchButtoms extends StatelessWidget {
                 var result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const QRScanPage()));
-                await addFriendUseQR(result, model, uid, context);
+                        builder: (context) =>
+                            QRScanPage(size: size, uid: uid)));
+                if (result != null) {
+                  await addFriendUseQR(result, model, uid, context);
+                }
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
