@@ -40,7 +40,7 @@ class MyQRcodePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         QrImage(
-                          data: '${model.userInfo['QRpass']}',
+                          data: model.userInfo['QRpass'],
                           version: QrVersions.auto,
                           size: 200.0,
                         ),

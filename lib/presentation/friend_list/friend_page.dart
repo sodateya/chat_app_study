@@ -59,7 +59,10 @@ class FriendListPage extends StatelessWidget {
                                 top: Radius.circular(25.0)),
                           ),
                           builder: ((context) {
-                            return AddFriendListPage(uid: uid, size: size);
+                            return AddFriendListPage(
+                              uid: uid,
+                              size: size,
+                            );
                           }));
                     },
                     icon: const Icon(Icons.person_add_alt_1))

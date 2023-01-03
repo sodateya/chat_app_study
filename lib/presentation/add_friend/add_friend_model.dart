@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_code_tools/qr_code_tools.dart';
+import 'package:uni_links/uni_links.dart';
 import '../../domain/friend.dart';
 
 class AddFriendModel extends ChangeNotifier {
@@ -87,6 +90,25 @@ class AddFriendModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future check(String pass, String uid) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('user')
+          .where('QRpass', isEqualTo: pass)
+          .get();
+      final length = doc.docs.length;
+      if (length == 0) {
+        // ignore: use_build_context_synchronously
+        throw ('該当するユーザーが見つかりません');
+      } else {
+        firendData = doc.docs.first.data();
+        notifyListeners();
+      }
+    } catch (e) {
+      throw ('QRコードが不正です');
+    }
+  }
+
   Future chackIsMyFriend(String friendUid, String uid) async {
     final doc = await FirebaseFirestore.instance
         .collection('user')
@@ -155,7 +177,6 @@ class AddFriendModel extends ChangeNotifier {
 
   List<Friend> userList = [];
   Map<String, dynamic> userInfo = {};
-
   final firestore = FirebaseFirestore.instance;
 
   Future fetchApplyList(String uid) async {

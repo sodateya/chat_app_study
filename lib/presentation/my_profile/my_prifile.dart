@@ -123,16 +123,6 @@ class MyProfilePage extends StatelessWidget {
                                 await model.updateToken(uid);
                               },
                               child: Text('トークンアップデート')),
-                          QrImage(
-                            data: '${model.userInfo['QRpass']}',
-                            version: QrVersions.auto,
-                            size: 200.0,
-                          ),
-                          ElevatedButton(
-                              onPressed: () async {
-                                await model.updateQRpass(uid);
-                              },
-                              child: Text('RQコード更新')),
                         ]),
             ));
       }),

@@ -1,10 +1,11 @@
-import 'dart:io';
+// ignore_for_file: use_build_context_synchronously, depend_on_referenced_packages
 
+import 'dart:io';
 import 'package:chat_app_study/presentation/add_friend/add_friend_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'my_qr_page.dart';
 
@@ -111,7 +112,32 @@ class _QRScanPageState extends State<QRScanPage> {
                               IconButton(
                                 onPressed: () async {
                                   await model.decode();
-                                  await check(model.data);
+                                  final Uri url = Uri.parse(model.data);
+                                  if (!await launchUrl(url)) {
+                                    await showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title:
+                                                const Text('該当するユーザーが見つかりません'),
+                                            actions: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: const Text('閉じる'))
+                                                ],
+                                              )
+                                            ],
+                                          );
+                                        });
+                                  }
+                                  Navigator.of(context).pop();
                                 },
                                 icon: const Icon(
                                     Icons.photo_size_select_actual_rounded),
@@ -160,43 +186,31 @@ class _QRScanPageState extends State<QRScanPage> {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) async {
-      print(scanData.code.toString());
-      controller.pauseCamera();
-      print('ready');
-      check(scanData.code.toString());
-      controller.resumeCamera();
-    });
-  }
-
-  Future<void> check(String data) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('user')
-          .where('QRpass', isEqualTo: data)
-          .get();
-      final length = doc.docs.length;
-      if (length == 0) {
-        // ignore: use_build_context_synchronously
-        await await showDialog(
+      await controller.pauseCamera();
+      final Uri url = Uri.parse(scanData.code.toString());
+      if (!await launchUrl(url)) {
+        await showDialog(
             context: context,
-            builder: ((context) {
-              return const AlertDialog(
-                title: Text('該当するユーザーが見つかりません'),
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('該当するユーザーが見つかりません'),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('閉じる'))
+                    ],
+                  )
+                ],
               );
-            }));
-      } else {
-        print(doc.docs.first.data()['name']);
-        Navigator.pop(context, doc.docs.first.data());
+            });
       }
-    } catch (e) {
-      showDialog(
-          context: context,
-          builder: ((context) {
-            return const AlertDialog(
-              title: Text('error'),
-            );
-          }));
-    }
+      Navigator.of(context).pop();
+    });
   }
 
   Future showMyQRCode() async {

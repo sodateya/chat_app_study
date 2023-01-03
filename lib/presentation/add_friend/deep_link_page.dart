@@ -10,14 +10,10 @@ import 'package:provider/provider.dart';
 import '../../domain/friend.dart';
 import 'add_friend_model.dart';
 
-class AddFriendListPage extends StatelessWidget {
-  AddFriendListPage({
-    super.key,
-    required this.uid,
-    required this.size,
-  });
+class DeepLinkPage extends StatelessWidget {
+  DeepLinkPage({super.key, required this.uid, required this.qrPass});
   String uid;
-  Size size;
+  String qrPass;
 
   ScrollController scrollController = ScrollController();
   void getMore() async {
@@ -26,40 +22,34 @@ class AddFriendListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return ChangeNotifierProvider.value(
         value: AddFriendModel()..fetchApplyList(uid),
         child: Consumer<AddFriendModel>(builder: (context, model, child) {
+          if (qrPass != '') {
+            model.check(qrPass, uid);
+            addFriendUseQR(model.firendData!, model, uid, context);
+          }
           final friends = model.userList;
-          return SizedBox(
-            height: size.height * 0.8,
-            child: Column(
+          return Scaffold(
+            appBar: AppBar(
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                  Color(0xff8171D3),
+                  Color(0xff9DD3E4)
+                ] //グラデーションの設定
+                        )),
+              ),
+              title: Text('友達追加'),
+            ),
+            body: Column(
               children: [
-                Container(
-                  decoration: const BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.settings),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      const Text(
-                        '友達追加',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          Navigator.of(context, rootNavigator: true).pop();
-                        },
-                      ),
-                    ],
-                  ),
+                SearchButtoms(
+                  size,
+                  model,
+                  uid,
                 ),
-                SearchButtoms(size, model, uid),
                 friends.isEmpty
                     ? const Center(
                         child: Text('現在申請されているユーザーはいません'),
