@@ -97,22 +97,35 @@ class TalkPage extends StatelessWidget {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
                                                 children: [
-                                                  Container(
-                                                      height: size.width * 0.1,
-                                                      width: size.width * 0.1,
-                                                      decoration: BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          image: DecorationImage(
-                                                              fit: BoxFit.fill,
-                                                              image: NetworkImage(
-                                                                  userInfo[
-                                                                      'photUrl'])))),
+                                                  userInfo['photUrl'] != ''
+                                                      ? Container(
+                                                          height: 55,
+                                                          width: 55,
+                                                          decoration: BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              image: DecorationImage(
+                                                                  fit: BoxFit
+                                                                      .fill,
+                                                                  image: NetworkImage(
+                                                                      userInfo[
+                                                                          'photUrl']))))
+                                                      : Container(
+                                                          height: 55,
+                                                          width: 55,
+                                                          decoration: const BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              image: DecorationImage(
+                                                                  fit: BoxFit
+                                                                      .fill,
+                                                                  image: AssetImage(
+                                                                      'images/user.png')))),
                                                 ],
                                               )
                                             : Container(
-                                                height: size.width * 0.1,
-                                                width: size.width * 0.1,
+                                                height: 55,
+                                                width: 55,
                                               ),
                                         otherTalk(
                                             size, talks[index], roomID, uid),

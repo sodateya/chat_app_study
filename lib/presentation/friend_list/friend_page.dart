@@ -94,7 +94,7 @@ class FriendListPage extends StatelessWidget {
                             decoration: const BoxDecoration(
                                 border: Border(
                                     bottom: BorderSide(color: Colors.grey))),
-                            height: size.height * 0.1,
+                            height: 85,
                             child: ListView.builder(
                               physics: const AlwaysScrollableScrollPhysics(),
                               controller: scrollController2,

@@ -3,14 +3,11 @@
 import 'dart:async';
 
 import 'package:chat_app_study/presentation/add_friend/add_friend_model.dart';
-import 'package:chat_app_study/presentation/add_friend/qr_scan_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
-import '../add_friend/add_friend.dart';
 import 'home_model.dart';
 
 // ignore: must_be_immutable
@@ -25,6 +22,12 @@ class _HomeState extends State<Home> {
   StreamSubscription? _sub;
   String? catchLink;
   String? parameter;
+  String? getQueryParameter(String? link) {
+    if (link == null) return null;
+    final uri = Uri.parse(link);
+    String? name = uri.queryParameters['code'];
+    return name;
+  }
 
   @override
   void initState() {
@@ -36,14 +39,6 @@ class _HomeState extends State<Home> {
   void dispose() {
     _sub?.cancel();
     super.dispose();
-  }
-
-  String? getQueryParameter(String? link) {
-    if (link == null) return null;
-    final uri = Uri.parse(link);
-    //flutterUniversity://user/?name=matsumaruのmatsumaru部分を取得
-    String? name = uri.queryParameters['code'];
-    return name;
   }
 
   @override
@@ -84,7 +79,6 @@ class _HomeState extends State<Home> {
       catchLink = link;
       parameter = getQueryParameter(link);
       setState(() {});
-      print(parameter);
       try {
         await check(parameter!, FirebaseAuth.instance.currentUser!.uid);
         addFriendUseQR(firendData!, AddFriendModel(),

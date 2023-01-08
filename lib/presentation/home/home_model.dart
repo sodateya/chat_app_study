@@ -1,5 +1,6 @@
 // ignore_for_file: missing_return
 
+import 'package:chat_app_study/presentation/get_uid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../apply_list/apply_list.dart';
@@ -12,7 +13,7 @@ class HomeModel extends ChangeNotifier {
     FriendListPage(uid: FirebaseAuth.instance.currentUser!.uid),
     FriendListPage(uid: FirebaseAuth.instance.currentUser!.uid),
     SettingPage(auth: FirebaseAuth.instance),
-    ApplyListPage(uid: FirebaseAuth.instance.currentUser!.uid),
+    GetUidPage(),
   ];
 
   int selectedIndex = 0;
