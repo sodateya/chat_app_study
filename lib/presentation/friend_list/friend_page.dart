@@ -216,6 +216,7 @@ class UserTile extends StatelessWidget {
                                         uid: uid,
                                         size: size,
                                         userInfo: model.userInfo,
+                                        userInfoList: model.userInfoList,
                                       )));
                           print('トーク画面へ');
                           break;

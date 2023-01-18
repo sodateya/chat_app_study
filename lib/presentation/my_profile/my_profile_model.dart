@@ -64,7 +64,7 @@ class MyProfileModel extends ChangeNotifier {
   }
 
   Future updataPhot(String uid) async {
-    final doc = FirebaseFirestore.instance.collection('user').doc(uid);
+    final doc = await FirebaseFirestore.instance.collection('user').doc(uid);
     String? imgURL;
     if (imageFile != null) {
       final task = await FirebaseStorage.instance
@@ -73,6 +73,7 @@ class MyProfileModel extends ChangeNotifier {
       imgURL = await task.ref.getDownloadURL();
     }
     await doc.update({'photUrl': imgURL});
+    print('pon');
   }
 
   Future pickImage() async {

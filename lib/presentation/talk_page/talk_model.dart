@@ -20,6 +20,7 @@ class TalkModel extends ChangeNotifier {
   File? imageFile;
   final picker = ImagePicker();
   bool isSending = false;
+  String userIcon = '';
 
   void startSend() {
     isSending = true;
@@ -37,13 +38,21 @@ class TalkModel extends ChangeNotifier {
   }
 
   Future getTalk(String roomID) async {
+    firebase.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
     print('get');
-    final doc = firebase
+    final doc = await firebase
         .collection('rooms')
         .doc(roomID)
         .collection('talks')
         .orderBy('createdAt', descending: true)
         .snapshots();
+    //     .get(const GetOptions(source: Source.cache));
+    // final talk = doc.docs.map((e) => Talk(e)).toList();
+    // talks = talk;
+    notifyListeners();
     doc.listen((snapshots) async {
       final talk = snapshots.docs.map((doc) => Talk(doc)).toList();
       talks = talk;
@@ -82,13 +91,11 @@ class TalkModel extends ChangeNotifier {
     if (message == '') {
       throw ('メッセージを入力、または画像を選択してください');
     }
-
     final doc = FirebaseFirestore.instance
         .collection('rooms')
         .doc(roomID)
         .collection('talks')
         .doc();
-
     await doc.set({
       'uid': uid,
       'createdAt': FieldValue.serverTimestamp(),
@@ -129,5 +136,24 @@ class TalkModel extends ChangeNotifier {
         source: ImageSource.gallery, maxHeight: 400, maxWidth: 400);
     imageFile = File(pickedFile!.path);
     return imageFile;
+  }
+
+  Future<String> getUserInfo(String uid) async {
+    final doc = await firestore.collection('user').doc(uid).get();
+    final icon = doc.data()!['photUrl'];
+    notifyListeners();
+    return icon;
+  }
+
+  Map<String, dynamic> focusInfo = {};
+  Future getFocusInfo(
+      uid, List<Map<String, Map<String, dynamic>>> userInfoList) async {
+    print('pon');
+    userInfoList.forEach((element) {
+      if (element.keys.single == uid) {
+        focusInfo = element.values.single;
+      } else {}
+    });
+    return focusInfo;
   }
 }

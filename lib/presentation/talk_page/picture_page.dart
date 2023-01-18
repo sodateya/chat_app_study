@@ -74,7 +74,7 @@ class PicturePage extends StatelessWidget {
                     onPressed: () async {
                       try {
                         model.startSend();
-                        await ontap();
+                        ontap();
                         // await model.addImage(roomID, uid);
                       } catch (e) {
                         print(e);

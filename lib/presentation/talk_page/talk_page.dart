@@ -22,12 +22,13 @@ class TalkPage extends StatelessWidget {
       required this.roomID,
       required this.uid,
       required this.size,
-      required this.userInfo});
+      required this.userInfo,
+      required this.userInfoList});
   late String roomID;
   late String uid;
   late Size size;
   late Map<String, dynamic> userInfo;
-
+  List<Map<String, Map<String, dynamic>>> userInfoList = [];
   TextEditingController commentController = TextEditingController();
 
   @override
@@ -57,10 +58,8 @@ class TalkPage extends StatelessWidget {
                         await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PictureListPage(
-                                size: size,
-                                roomID: roomID,
-                              ),
+                              builder: (context) =>
+                                  PictureListPage(size: size, roomID: roomID),
                               fullscreenDialog: true,
                             ));
                       },
@@ -98,18 +97,25 @@ class TalkPage extends StatelessWidget {
                                                     MainAxisAlignment.start,
                                                 children: [
                                                   userInfo['photUrl'] != ''
-                                                      ? Container(
-                                                          height: 55,
-                                                          width: 55,
-                                                          decoration: BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                              image: DecorationImage(
-                                                                  fit: BoxFit
-                                                                      .fill,
-                                                                  image: NetworkImage(
-                                                                      userInfo[
-                                                                          'photUrl']))))
+                                                      ? userInfo['photUrl'] ==
+                                                              'https://cdn-icons-png.flaticon.com/512/1246/1246366.png'
+                                                          ? OtherIcon(
+                                                              talk:
+                                                                  talks[index],
+                                                              userInfoList:
+                                                                  userInfoList)
+                                                          : Container(
+                                                              height: 55,
+                                                              width: 55,
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  image: DecorationImage(
+                                                                      fit: BoxFit
+                                                                          .fill,
+                                                                      image: NetworkImage(
+                                                                          userInfo[
+                                                                              'photUrl']))))
                                                       : Container(
                                                           height: 55,
                                                           width: 55,
@@ -123,7 +129,7 @@ class TalkPage extends StatelessWidget {
                                                                       'images/user.png')))),
                                                 ],
                                               )
-                                            : Container(
+                                            : const SizedBox(
                                                 height: 55,
                                                 width: 55,
                                               ),
@@ -227,7 +233,6 @@ class TalkPage extends StatelessWidget {
                                             model.startSend();
                                             await model.addMessage(roomID, uid);
                                           } catch (e) {
-                                            print(e);
                                             final snackBar = SnackBar(
                                               backgroundColor: Colors.redAccent,
                                               behavior:
@@ -268,15 +273,57 @@ class TalkPage extends StatelessWidget {
   }
 }
 
+class OtherIcon extends StatelessWidget {
+  OtherIcon({super.key, required this.talk, required this.userInfoList});
+  Talk talk;
+  List<Map<String, Map<String, dynamic>>> userInfoList;
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider.value(
+        value: TalkModel()..getFocusInfo(talk.uid, userInfoList),
+        child: Consumer<TalkModel>(
+          builder: (context, model, child) {
+            return model.focusInfo['photUrl'] == ''
+                ? const CircularProgressIndicator()
+                : Container(
+                    height: 50,
+                    width: 50,
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
+                    clipBehavior: Clip.antiAlias,
+                    child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: model.focusInfo['photUrl']),
+                  );
+          },
+        ));
+  }
+}
+
+Widget otherIcon(
+    Talk talk, List<Map<String, Map<String, dynamic>>> userInfoList) {
+  return ChangeNotifierProvider.value(
+      value: TalkModel()
+        ..getFocusInfo(talk.uid, userInfoList).then((value) => print(value)),
+      child: Consumer<TalkModel>(
+        builder: (context, model, child) {
+          return model.focusInfo['photUrl'] == ''
+              ? const CircularProgressIndicator()
+              : Container(
+                  height: 50,
+                  width: 50,
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                  clipBehavior: Clip.antiAlias,
+                  child: CachedNetworkImage(
+                      fit: BoxFit.cover, imageUrl: model.focusInfo['photUrl']),
+                );
+        },
+      ));
+}
+
 Widget otherTalk(Size size, Talk talk, String roomID, String uid) {
   return ChangeNotifierProvider.value(
       value: TalkModel(),
       child: Consumer<TalkModel>(builder: (context, model, child) {
-        if (talk.read.contains(uid)) {
-        } else {
-          model.read(roomID, uid, talk.id);
-          print('既読');
-        }
         return Padding(
           padding: const EdgeInsets.all(10.0),
           child: SizedBox(

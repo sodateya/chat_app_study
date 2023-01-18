@@ -12,13 +12,11 @@ List<Friend> userList = [];
 
 class FriendModel extends ChangeNotifier {
   List<Friend> userList = [];
-
   List<UserDB> allUserList = [];
-
   Map<String, dynamic> userInfo = {};
   Map<String, dynamic> allUserInfo = {};
-
   final firestore = FirebaseFirestore.instance;
+  List<Map<String, Map<String, dynamic>>> userInfoList = [];
 
   Future getUserList(String uid) async {
     final doc = await firestore
